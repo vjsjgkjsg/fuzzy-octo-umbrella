@@ -276,6 +276,33 @@ body {
     color: var(--primary);
 }
 
+/* Экран категории */
+.category-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.back-button {
+    font-size: 18px;
+    color: var(--primary);
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.category-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0;
+}
+
+.category-content {
+    color: var(--text);
+}
+
+/* Модальное окно */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -410,4 +437,4 @@ body {
 
 .mic-overlay.active {
     display: flex;
-   }
+}
