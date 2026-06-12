@@ -36,6 +36,7 @@ const emergencyStates = [
 
 let emergencyMode = false;
 
+// Рендер категорий на главном экране
 function renderCategories(filterText = "") {
     const grid = document.getElementById('categoryGrid');
     if (!grid) return;
@@ -43,7 +44,9 @@ function renderCategories(filterText = "") {
     const filter = filterText.toLowerCase();
     categories.forEach(cat => {
         const matches = !filter || cat.title.toLowerCase().includes(filter) || cat.tags.some(t => t.includes(filter));
-        if (emergencyMode && !["Неотложные состояния", "Лекарственный справочник", "Медицинские калькуляторы", "Первая помощь", "Скорая медицинская помощь"].includes(cat.title)) return;
+        if (emergencyMode && !["Неотложные состояния", "Лекарственный справочник", "Медицинские калькуляторы", "Первая помощь", "Скорая медицинская помощь"].includes(cat.title)) {
+            return;
+        }
         const card = document.createElement('div');
         card.className = 'card';
         if (!matches) card.classList.add('hidden');
@@ -53,6 +56,7 @@ function renderCategories(filterText = "") {
     });
 }
 
+// Рендер модального окна экстренной помощи
 function renderEmergency() {
     const grid = document.getElementById('emergencyGrid');
     if (!grid) return;
@@ -69,17 +73,20 @@ function renderEmergency() {
     });
 }
 
+// Фильтрация карточек при поиске
 function filterCards() {
     const input = document.getElementById('mainSearch');
     if (input) renderCategories(input.value);
 }
 
+// Переключение темы
 function toggleTheme() {
     document.body.classList.toggle('dark');
     const btn = document.getElementById('themeToggle');
     if (btn) btn.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
 }
 
+// Режим скорой
 function toggleEmergencyMode() {
     emergencyMode = !emergencyMode;
     const btn = document.getElementById('emergencyModeBtn');
@@ -92,46 +99,63 @@ function toggleEmergencyMode() {
             btn.innerHTML = '⚡ Режим скорой';
         }
     }
-    renderCategories(document.getElementById('mainSearch')?.value || "");
+    const searchInput = document.getElementById('mainSearch');
+    renderCategories(searchInput ? searchInput.value : "");
 }
 
+// Навигация по табам
 function switchTab(tab) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+
     const screenMap = {
         home: 'homeScreen',
         search: 'searchScreen',
         favorites: 'favoritesScreen',
         profile: 'profileScreen'
     };
-    const target = document.getElementById(screenMap[tab]);
-    if (target) target.classList.add('active');
+    const targetScreen = document.getElementById(screenMap[tab]);
+    if (targetScreen) targetScreen.classList.add('active');
+
     document.querySelectorAll('.tab-item').forEach(item => {
         if (item.dataset.tab === tab) item.classList.add('active');
     });
 }
 
-// ВАЖНО: эта функция управляет переходом
+// Открытие категории: для готовых разделов – переход на отдельную страницу,
+// для остальных – временная заглушка внутри приложения
 function openCategory(title, tags) {
+    // Готовые разделы с отдельными HTML
     if (title === "Неотложные состояния") {
         window.location.href = "emergency.html";
         return;
     }
+    if (title === "Первая помощь") {
+        window.location.href = "first_aid.html";
+        return;
+    }
+    // Избранное ведёт на соответствующий таб
     if (title === "Избранное") {
         switchTab('favorites');
         return;
     }
-    // Остальные разделы показывают заглушку
+
+    // Остальные разделы – заглушка
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     const categoryScreen = document.getElementById('categoryScreen');
     const titleEl = document.getElementById('categoryTitle');
     const contentEl = document.getElementById('categoryContent');
+    
     if (titleEl) titleEl.textContent = title;
-    if (contentEl) contentEl.innerHTML = `<div class="placeholder">Раздел «${title}» в разработке</div>`;
+    if (contentEl) {
+        contentEl.innerHTML = `<div class="placeholder">Раздел «${title}» в разработке</div>`;
+    }
     if (categoryScreen) categoryScreen.classList.add('active');
+    
     document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
 }
 
+// Закрытие категории (кнопка "Назад") – возврат на главную
 function closeCategory() {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById('homeScreen').classList.add('active');
@@ -143,34 +167,73 @@ function closeCategory() {
     renderCategories();
 }
 
-function openEmergency() { document.getElementById('emergencyModal').classList.add('open'); }
-function closeEmergency(e) { if (e.target === document.getElementById('emergencyModal')) document.getElementById('emergencyModal').classList.remove('open'); }
-function closeEmergencyDirect() { document.getElementById('emergencyModal').classList.remove('open'); }
-function callAmbulance() { alert('Вызов 103... (имитация)'); }
+// Модальное окно экстренной помощи
+function openEmergency() {
+    document.getElementById('emergencyModal').classList.add('open');
+}
+function closeEmergency(e) {
+    if (e.target === document.getElementById('emergencyModal')) {
+        document.getElementById('emergencyModal').classList.remove('open');
+    }
+}
+function closeEmergencyDirect() {
+    document.getElementById('emergencyModal').classList.remove('open');
+}
 
+// Имитация вызова скорой
+function callAmbulance() {
+    alert('Вызов 103... (имитация)');
+}
+
+// Заглушка микрофона
 function toggleMic() {
     const overlay = document.getElementById('micOverlay');
     overlay.classList.toggle('active');
     if (overlay.classList.contains('active')) {
         setTimeout(() => {
             overlay.classList.remove('active');
-            const input = document.getElementById('mainSearch');
-            if (input) { input.value = "например, анафилаксия"; filterCards(); }
+            const searchInput = document.getElementById('mainSearch');
+            if (searchInput) {
+                searchInput.value = "например, анафилаксия";
+                filterCards();
+            }
         }, 2000);
     }
 }
 
-// Привязка событий
+// Привязка обработчиков после загрузки DOM
 document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('emergencyButton')?.addEventListener('click', openEmergency);
-    document.getElementById('emergencyModal')?.addEventListener('click', closeEmergency);
-    document.getElementById('closeEmergencyModal')?.addEventListener('click', closeEmergencyDirect);
-    document.getElementById('callAmbulanceBtn')?.addEventListener('click', callAmbulance);
-    document.getElementById('mainSearch')?.addEventListener('input', filterCards);
-    document.getElementById('micButton')?.addEventListener('click', toggleMic);
-    document.getElementById('themeToggle')?.addEventListener('click', toggleTheme);
-    document.getElementById('emergencyModeBtn')?.addEventListener('click', toggleEmergencyMode);
+    // Кнопка экстренной помощи
+    const emergencyBtn = document.getElementById('emergencyButton');
+    if (emergencyBtn) emergencyBtn.addEventListener('click', openEmergency);
 
+    // Закрытие модального окна
+    const modal = document.getElementById('emergencyModal');
+    if (modal) modal.addEventListener('click', closeEmergency);
+    const closeBtn = document.getElementById('closeEmergencyModal');
+    if (closeBtn) closeBtn.addEventListener('click', closeEmergencyDirect);
+
+    // Кнопка вызова скорой
+    const callBtn = document.getElementById('callAmbulanceBtn');
+    if (callBtn) callBtn.addEventListener('click', callAmbulance);
+
+    // Поиск на главной
+    const searchInput = document.getElementById('mainSearch');
+    if (searchInput) searchInput.addEventListener('input', filterCards);
+
+    // Микрофон
+    const micBtn = document.getElementById('micButton');
+    if (micBtn) micBtn.addEventListener('click', toggleMic);
+
+    // Переключатель темы
+    const themeBtn = document.getElementById('themeToggle');
+    if (themeBtn) themeBtn.addEventListener('click', toggleTheme);
+
+    // Режим скорой
+    const emergencyModeBtn = document.getElementById('emergencyModeBtn');
+    if (emergencyModeBtn) emergencyModeBtn.addEventListener('click', toggleEmergencyMode);
+
+    // Таб-бар
     document.querySelectorAll('.tab-item').forEach(item => {
         item.addEventListener('click', () => {
             const tab = item.dataset.tab;
@@ -178,15 +241,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // Быстрые действия (горизонтальный скролл)
     document.querySelectorAll('.quick-action').forEach(action => {
         action.addEventListener('click', () => {
             const category = action.dataset.category;
-            if (category) openCategory(category, []);
+            if (category) {
+                openCategory(category, []);
+            }
         });
     });
 
-    document.getElementById('backFromCategory')?.addEventListener('click', closeCategory);
+    // Кнопка "Назад" из внутреннего экрана категории
+    const backBtn = document.getElementById('backFromCategory');
+    if (backBtn) backBtn.addEventListener('click', closeCategory);
 
+    // Первоначальный рендер
     renderCategories();
     renderEmergency();
 });
