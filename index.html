@@ -532,4 +532,89 @@
                 item.innerHTML = `${state.icon} ${state.name}`;
                 item.onclick = () => {
                     alert(`Открыт алгоритм: ${state.name}`);
-                    
+                    closeEmergencyDirect();
+                };
+                grid.appendChild(item);
+            });
+        }
+
+        // Фильтрация карточек при вводе в поиск
+        function filterCards() {
+            const query = document.getElementById('mainSearch').value;
+            renderCategories(query);
+        }
+
+        // Переключение темы
+        function toggleTheme() {
+            document.body.classList.toggle('dark');
+            const btn = document.getElementById('themeToggle');
+            btn.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
+        }
+
+        // Переключение режима скорой
+        function toggleEmergencyMode() {
+            emergencyMode = !emergencyMode;
+            const btn = document.getElementById('emergencyModeBtn');
+            if (emergencyMode) {
+                btn.classList.add('active-action');
+                btn.innerHTML = '⚡ Режим скорой (вкл)';
+            } else {
+                btn.classList.remove('active-action');
+                btn.innerHTML = '⚡ Режим скорой';
+            }
+            renderCategories(document.getElementById('mainSearch').value);
+        }
+
+        // Навигация по табам
+        function switchTab(tab) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+            const screenMap = {
+                home: 'homeScreen',
+                search: 'searchScreen',
+                favorites: 'favoritesScreen',
+                profile: 'profileScreen'
+            };
+            document.getElementById(screenMap[tab]).classList.add('active');
+            const tabs = ['home', 'search', 'favorites', 'profile'];
+            document.querySelectorAll('.tab-item').forEach((item, index) => {
+                if (tabs[index] === tab) item.classList.add('active');
+            });
+        }
+
+        // Модальное окно
+        function openEmergency() {
+            document.getElementById('emergencyModal').classList.add('open');
+        }
+        function closeEmergency(event) {
+            if (event.target === document.getElementById('emergencyModal')) {
+                document.getElementById('emergencyModal').classList.remove('open');
+            }
+        }
+        function closeEmergencyDirect() {
+            document.getElementById('emergencyModal').classList.remove('open');
+        }
+        function callAmbulance() {
+            // В реальном приложении: tel:103 или интеграция с телефонией
+            alert('Вызов 103... (имитация)');
+        }
+
+        // Имитация голосового ввода
+        function toggleMic() {
+            const overlay = document.getElementById('micOverlay');
+            overlay.classList.toggle('active');
+            if (overlay.classList.contains('active')) {
+                setTimeout(() => {
+                    overlay.classList.remove('active');
+                    document.getElementById('mainSearch').value = "например, анафилаксия";
+                    filterCards();
+                }, 2000);
+            }
+        }
+
+        // Инициализация
+        renderCategories();
+        renderEmergency();
+    </script>
+</body>
+</html>
