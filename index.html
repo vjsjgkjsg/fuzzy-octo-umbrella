@@ -4,617 +4,94 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>MedPocket KZ – Карманный справочник</title>
-    <style>
-        :root {
-            --bg: #F5F7FA;
-            --card-bg: #FFFFFF;
-            --text: #1A1A1A;
-            --subtext: #6B7280;
-            --primary: #0B2B5E;
-            --accent: #00BFA6;
-            --danger: #E53935;
-            --border: #E5E7EB;
-            --shadow: 0 2px 8px rgba(0,0,0,0.04);
-            --emergency-item-bg: #FFF5F5;
-            --emergency-item-border: #FECACA;
-        }
-        body.dark {
-            --bg: #1F2937;
-            --card-bg: #374151;
-            --text: #F9FAFB;
-            --subtext: #D1D5DB;
-            --primary: #60A5FA;
-            --border: #4B5563;
-            --shadow: 0 2px 8px rgba(0,0,0,0.2);
-            --emergency-item-bg: #7F1D1D;
-            --emergency-item-border: #B91C1C;
-        }
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-            font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif;
-            transition: background-color 0.3s, color 0.2s, border-color 0.3s, box-shadow 0.3s;
-        }
-        body {
-            background: #0B2B5E;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-        }
-        #app {
-            width: 100%;
-            max-width: 480px;
-            background: var(--bg);
-            min-height: 100vh;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 0 30px rgba(0,0,0,0.3);
-        }
-        .header {
-            background: var(--card-bg);
-            padding: 12px 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 1px solid var(--border);
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-        .logo {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--primary);
-            letter-spacing: -0.5px;
-        }
-        .header-icons {
-            display: flex;
-            gap: 16px;
-            align-items: center;
-            font-size: 22px;
-        }
-        .theme-toggle {
-            cursor: pointer;
-            user-select: none;
-            font-size: 20px;
-            background: none;
-            border: none;
-            color: var(--text);
-        }
-        .content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 16px 16px 0;
-            -webkit-overflow-scrolling: touch;
-            padding-bottom: 80px;
-        }
-        .screen {
-            display: none;
-        }
-        .screen.active {
-            display: block;
-        }
-        /* Поиск */
-        .search-container {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 4px 16px;
-            display: flex;
-            align-items: center;
-            margin-bottom: 16px;
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow);
-        }
-        .search-container input {
-            flex: 1;
-            border: none;
-            font-size: 16px;
-            padding: 12px 0;
-            outline: none;
-            background: transparent;
-            color: var(--text);
-        }
-        .search-container input::placeholder {
-            color: var(--subtext);
-        }
-        .search-mic {
-            font-size: 20px;
-            margin-left: 8px;
-            cursor: pointer;
-            color: var(--subtext);
-        }
-        /* Красная кнопка */
-        .emergency-btn {
-            background: var(--danger);
-            border-radius: 16px;
-            padding: 14px 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(229,57,53,0.3);
-            transition: transform 0.1s, box-shadow 0.1s;
-        }
-        .emergency-btn:active {
-            transform: scale(0.97);
-            box-shadow: 0 2px 6px rgba(229,57,53,0.2);
-        }
-        .emergency-btn .text {
-            color: white;
-            font-weight: 700;
-            font-size: 17px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .emergency-btn .arrow {
-            color: white;
-            font-size: 20px;
-        }
-        /* Быстрые действия */
-        .quick-actions {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 24px;
-            overflow-x: auto;
-            padding-bottom: 4px;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-        }
-        .quick-actions::-webkit-scrollbar {
-            display: none;
-        }
-        .quick-action {
-            background: var(--card-bg);
-            border-radius: 20px;
-            padding: 10px 16px;
-            white-space: nowrap;
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--primary);
-            box-shadow: var(--shadow);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            flex-shrink: 0;
-            cursor: pointer;
-            border: 1px solid var(--border);
-            transition: background 0.2s;
-        }
-        .quick-action.active-action {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-        /* Сетка карточек */
-        .grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            justify-content: space-between;
-        }
-        .card {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 14px;
-            width: calc(50% - 6px);
-            box-shadow: var(--shadow);
-            transition: transform 0.15s, box-shadow 0.15s;
-            cursor: pointer;
-            border: 1px solid var(--border);
-        }
-        .card:active {
-            transform: scale(0.96);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        .card .icon {
-            font-size: 28px;
-            margin-bottom: 8px;
-        }
-        .card .title {
-            font-weight: 700;
-            font-size: 15px;
-            color: var(--text);
-            margin-bottom: 4px;
-        }
-        .card .desc {
-            font-size: 12px;
-            color: var(--subtext);
-            line-height: 1.4;
-        }
-        .card.hidden {
-            display: none;
-        }
-        /* Нижняя панель */
-        .tab-bar {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            max-width: 480px;
-            background: var(--card-bg);
-            display: flex;
-            justify-content: space-around;
-            padding: 8px 0 20px;
-            border-top: 1px solid var(--border);
-            z-index: 20;
-        }
-        .tab-item {
-            cursor: pointer;
-            font-size: 22px;
-            padding: 4px 16px;
-            color: #9CA3AF;
-            font-weight: 500;
-            transition: color 0.2s;
-        }
-        .tab-item.active {
-            color: var(--primary);
-        }
-        /* Модальное окно */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 30;
-            display: flex;
-            justify-content: center;
-            align-items: flex-end;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s;
-        }
-        .modal-overlay.open {
-            opacity: 1;
-            pointer-events: auto;
-        }
-        .modal-content {
-            background: var(--card-bg);
-            width: 100%;
-            max-width: 480px;
-            border-radius: 24px 24px 0 0;
-            padding: 20px 16px 30px;
-            max-height: 80vh;
-            overflow-y: auto;
-            transform: translateY(100%);
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .modal-overlay.open .modal-content {
-            transform: translateY(0);
-        }
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-        .modal-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--text);
-        }
-        .modal-close {
-            font-size: 24px;
-            cursor: pointer;
-            color: var(--subtext);
-        }
-        .emergency-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .emergency-item {
-            background: var(--emergency-item-bg);
-            border: 1px solid var(--emergency-item-border);
-            border-radius: 12px;
-            padding: 12px;
-            width: calc(50% - 5px);
-            font-weight: 600;
-            font-size: 14px;
-            color: #B91C1C;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: transform 0.1s;
-        }
-        .emergency-item:active {
-            transform: scale(0.96);
-        }
-        .call-ambulance {
-            background: var(--danger);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            padding: 12px;
-            width: 100%;
-            margin-bottom: 16px;
-            font-weight: 700;
-            font-size: 16px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: background 0.2s;
-        }
-        .footer-note {
-            text-align: center;
-            color: var(--subtext);
-            font-size: 12px;
-            margin-top: 16px;
-            padding-bottom: 16px;
-        }
-        /* Заглушки */
-        .placeholder {
-            font-size: 16px;
-            color: var(--subtext);
-            text-align: center;
-            padding: 40px 0;
-        }
-        .mic-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.7);
-            z-index: 40;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            font-size: 24px;
-            flex-direction: column;
-            gap: 16px;
-        }
-        .mic-overlay.active {
-            display: flex;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="app">
         <!-- Шапка -->
-        <div class="header">
+        <header class="header">
             <div class="logo">MedPocket KZ</div>
             <div class="header-icons">
                 <span>🔔</span>
-                <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙</button>
+                <button class="theme-toggle" id="themeToggle">🌙</button>
                 <span>⚙️</span>
             </div>
-        </div>
+        </header>
 
         <!-- Контент -->
-        <div class="content">
+        <main class="content">
             <!-- Главный экран -->
-            <div id="homeScreen" class="screen active">
-                <!-- Умный поиск -->
+            <section id="homeScreen" class="screen active">
                 <div class="search-container">
-                    <input type="text" placeholder="🔍 Поиск по диагнозу, препарату, приказу..." id="mainSearch" oninput="filterCards()">
-                    <span class="search-mic" onclick="toggleMic()">🎤</span>
+                    <input type="text" placeholder="🔍 Поиск по диагнозу, препарату, приказу..." id="mainSearch">
+                    <span class="search-mic" id="micButton">🎤</span>
                 </div>
 
-                <!-- Экстренная помощь -->
-                <div class="emergency-btn" onclick="openEmergency()">
+                <div class="emergency-btn" id="emergencyButton">
                     <span class="text">🚨 ЭКСТРЕННАЯ ПОМОЩЬ</span>
                     <span class="arrow">›</span>
                 </div>
 
-                <!-- Быстрые действия -->
                 <div class="quick-actions" id="quickActions">
                     <div class="quick-action">🚑 Неотложные</div>
                     <div class="quick-action">💊 Препараты</div>
                     <div class="quick-action">📋 Протоколы</div>
                     <div class="quick-action">📊 Калькуляторы</div>
                     <div class="quick-action">⭐ Избранное</div>
-                    <div class="quick-action" id="emergencyModeBtn" onclick="toggleEmergencyMode()">⚡ Режим скорой</div>
+                    <div class="quick-action" id="emergencyModeBtn">⚡ Режим скорой</div>
                 </div>
 
-                <!-- Сетка разделов -->
                 <div class="grid" id="categoryGrid"></div>
                 <div class="footer-note">База обновлена: июнь 2026 • МЗ РК</div>
-            </div>
+            </section>
 
             <!-- Экран поиска -->
-            <div id="searchScreen" class="screen">
+            <section id="searchScreen" class="screen">
                 <div class="search-container">
                     <input type="text" placeholder="Поиск по всему справочнику..." id="searchInput">
                     <span class="search-mic">🎤</span>
                 </div>
                 <div class="placeholder">Начните вводить запрос — результаты появятся здесь</div>
-            </div>
+            </section>
 
             <!-- Избранное -->
-            <div id="favoritesScreen" class="screen">
+            <section id="favoritesScreen" class="screen">
                 <div class="placeholder">⭐ Здесь будут ваши избранные алгоритмы и препараты</div>
-            </div>
+            </section>
 
             <!-- Профиль -->
-            <div id="profileScreen" class="screen">
+            <section id="profileScreen" class="screen">
                 <div class="placeholder">👤 Профиль и настройки специализации</div>
-            </div>
-        </div>
+            </section>
+        </main>
 
         <!-- Нижняя панель -->
-        <div class="tab-bar">
-            <div class="tab-item active" onclick="switchTab('home')">🏠</div>
-            <div class="tab-item" onclick="switchTab('search')">🔍</div>
-            <div class="tab-item" onclick="switchTab('favorites')">⭐</div>
-            <div class="tab-item" onclick="switchTab('profile')">👤</div>
-        </div>
+        <nav class="tab-bar">
+            <div class="tab-item active" data-tab="home">🏠</div>
+            <div class="tab-item" data-tab="search">🔍</div>
+            <div class="tab-item" data-tab="favorites">⭐</div>
+            <div class="tab-item" data-tab="profile">👤</div>
+        </nav>
 
         <!-- Модальное окно экстренных состояний -->
-        <div id="emergencyModal" class="modal-overlay" onclick="closeEmergency(event)">
-            <div class="modal-content" onclick="event.stopPropagation()">
+        <div id="emergencyModal" class="modal-overlay">
+            <div class="modal-content">
                 <div class="modal-header">
                     <span class="modal-title">🚨 Экстренная помощь</span>
-                    <span class="modal-close" onclick="closeEmergencyDirect()">✕</span>
+                    <span class="modal-close" id="closeEmergencyModal">✕</span>
                 </div>
-                <button class="call-ambulance" onclick="callAmbulance()">📞 Вызвать скорую (103)</button>
+                <button class="call-ambulance" id="callAmbulanceBtn">📞 Вызвать скорую (103)</button>
                 <div class="emergency-grid" id="emergencyGrid"></div>
             </div>
         </div>
 
         <!-- Заглушка микрофона -->
-        <div class="mic-overlay" id="micOverlay" onclick="toggleMic()">
-            <span style="font-size: 48px;">🎤</span>
+        <div class="mic-overlay" id="micOverlay">
+            <span style="font-size:48px;">🎤</span>
             <span>Скажите запрос...</span>
         </div>
     </div>
 
-    <script>
-        // Данные категорий
-        const categories = [
-            { icon: "🩺", title: "Первая помощь", desc: "Базовые алгоритмы, остановка кровотечений", tags: ["первая", "помощь", "кровотечение"] },
-            { icon: "🚑", title: "Неотложные состояния", desc: "Расширенные алгоритмы, шкалы", tags: ["неотложка", "шкала", "алгоритм"] },
-            { icon: "💊", title: "Лекарственный справочник", desc: "Более 1500 препаратов, дозировки", tags: ["препараты", "лекарства", "дозировка"] },
-            { icon: "📋", title: "Клинические протоколы РК", desc: "Актуальные версии, быстрый просмотр", tags: ["протоколы", "мз", "клинические"] },
-            { icon: "📖", title: "Приказы МЗ РК", desc: "По категориям, с отметкой действия", tags: ["приказы", "мз", "нормативные"] },
-            { icon: "📊", title: "Медицинские калькуляторы", desc: "Шкала Глазго, qSOFA, дозы для детей", tags: ["калькуляторы", "шкала", "расчет"] },
-            { icon: "📚", title: "Медицинские шпаргалки", desc: "Схемы, таблицы, нормы лабораторий", tags: ["шпаргалки", "схемы", "нормы"] },
-            { icon: "❤️", title: "Кардиология", desc: "ЭКГ-атлас, шкалы, антикоагулянты", tags: ["кардиология", "сердце", "экг"] },
-            { icon: "🧠", title: "Неврология", desc: "NIHSS, шкала комы, тромболизис", tags: ["неврология", "мозг", "инсульт"] },
-            { icon: "🫁", title: "Пульмонология", desc: "Пикфлоуметрия, ступени терапии БА", tags: ["пульмонология", "легкие", "астма"] },
-            { icon: "🦠", title: "Инфекционные болезни", desc: "Антибиотикограммы РК, прививки", tags: ["инфекции", "антибиотики", "прививки"] },
-            { icon: "🩹", title: "Травматология", desc: "Иммобилизация, объёмы кровопотери", tags: ["травматология", "перелом", "кровь"] },
-            { icon: "👶", title: "Педиатрия", desc: "Дозы по весу, процентили, неотложка", tags: ["педиатрия", "дети", "вес"] },
-            { icon: "🤰", title: "Акушерство и гинекология", desc: "Сроки, шкала Апгар, преэклампсия", tags: ["акушерство", "беременность", "роды"] },
-            { icon: "🧪", title: "Лабораторная диагностика", desc: "Референсные значения, интерпретация", tags: ["лаборатория", "анализы", "референсы"] },
-            { icon: "🏥", title: "Справочник фельдшера", desc: "Тактика на ФАПе, госпитализация", tags: ["фельдшер", "фап", "госпитализация"] },
-            { icon: "💉", title: "Инъекции и манипуляции", desc: "Техника с видео, наборы", tags: ["инъекции", "манипуляции", "уколы"] },
-            { icon: "🚑", title: "Скорая медицинская помощь", desc: "Укладки, чек-листы, связь с диспетчером", tags: ["скорая", "укладка", "диспетчер"] },
-            { icon: "📑", title: "МКБ-10", desc: "Поиск по коду и названию", tags: ["мкб", "код", "диагноз"] },
-            { icon: "⭐", title: "Избранное", desc: "Личная подборка", tags: ["избранное", "сохраненное"] }
-        ];
-
-        const emergencyStates = [
-            { icon: "🫀", name: "СЛР" },
-            { icon: "🩸", name: "Анафилактический шок" },
-            { icon: "❤️‍🔥", name: "Инфаркт миокарда" },
-            { icon: "🧠", name: "Инсульт" },
-            { icon: "🫁", name: "Отек легких" },
-            { icon: "⚡", name: "Судороги" },
-            { icon: "💤", name: "Комы" },
-            { icon: "🍬", name: "Гипогликемия" },
-            { icon: "💥", name: "Гипертонический криз" },
-            { icon: "🤧", name: "Отек Квинке" }
-        ];
-
-        let emergencyMode = false;
-
-        // Рендер категорий
-        function renderCategories(filterText = "") {
-            const grid = document.getElementById('categoryGrid');
-            grid.innerHTML = "";
-            const filter = filterText.toLowerCase();
-            categories.forEach(cat => {
-                const matches = !filter || cat.title.toLowerCase().includes(filter) || cat.tags.some(t => t.includes(filter));
-                if (emergencyMode && !["Неотложные состояния", "Лекарственный справочник", "Медицинские калькуляторы", "Первая помощь", "Скорая медицинская помощь"].includes(cat.title)) {
-                    return; // скрываем неэкстренные разделы в режиме скорой
-                }
-                const card = document.createElement('div');
-                card.className = 'card';
-                if (!matches) card.classList.add('hidden');
-                card.innerHTML = `<div class="icon">${cat.icon}</div><div class="title">${cat.title}</div><div class="desc">${cat.desc}</div>`;
-                card.onclick = () => alert(`Открыт раздел: ${cat.title}`);
-                grid.appendChild(card);
-            });
-        }
-
-        // Рендер экстренных состояний
-        function renderEmergency() {
-            const grid = document.getElementById('emergencyGrid');
-            grid.innerHTML = "";
-            emergencyStates.forEach(state => {
-                const item = document.createElement('div');
-                item.className = 'emergency-item';
-                item.innerHTML = `${state.icon} ${state.name}`;
-                item.onclick = () => {
-                    alert(`Открыт алгоритм: ${state.name}`);
-                    closeEmergencyDirect();
-                };
-                grid.appendChild(item);
-            });
-        }
-
-        // Фильтрация карточек при вводе в поиск
-        function filterCards() {
-            const query = document.getElementById('mainSearch').value;
-            renderCategories(query);
-        }
-
-        // Переключение темы
-        function toggleTheme() {
-            document.body.classList.toggle('dark');
-            const btn = document.getElementById('themeToggle');
-            btn.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
-        }
-
-        // Переключение режима скорой
-        function toggleEmergencyMode() {
-            emergencyMode = !emergencyMode;
-            const btn = document.getElementById('emergencyModeBtn');
-            if (emergencyMode) {
-                btn.classList.add('active-action');
-                btn.innerHTML = '⚡ Режим скорой (вкл)';
-            } else {
-                btn.classList.remove('active-action');
-                btn.innerHTML = '⚡ Режим скорой';
-            }
-            renderCategories(document.getElementById('mainSearch').value);
-        }
-
-        // Навигация по табам
-        function switchTab(tab) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-            const screenMap = {
-                home: 'homeScreen',
-                search: 'searchScreen',
-                favorites: 'favoritesScreen',
-                profile: 'profileScreen'
-            };
-            document.getElementById(screenMap[tab]).classList.add('active');
-            const tabs = ['home', 'search', 'favorites', 'profile'];
-            document.querySelectorAll('.tab-item').forEach((item, index) => {
-                if (tabs[index] === tab) item.classList.add('active');
-            });
-        }
-
-        // Модальное окно
-        function openEmergency() {
-            document.getElementById('emergencyModal').classList.add('open');
-        }
-        function closeEmergency(event) {
-            if (event.target === document.getElementById('emergencyModal')) {
-                document.getElementById('emergencyModal').classList.remove('open');
-            }
-        }
-        function closeEmergencyDirect() {
-            document.getElementById('emergencyModal').classList.remove('open');
-        }
-        function callAmbulance() {
-            // В реальном приложении: tel:103 или интеграция с телефонией
-            alert('Вызов 103... (имитация)');
-        }
-
-        // Имитация голосового ввода
-        function toggleMic() {
-            const overlay = document.getElementById('micOverlay');
-            overlay.classList.toggle('active');
-            if (overlay.classList.contains('active')) {
-                setTimeout(() => {
-                    overlay.classList.remove('active');
-                    document.getElementById('mainSearch').value = "например, анафилаксия";
-                    filterCards();
-                }, 2000);
-            }
-        }
-
-        // Инициализация
-        renderCategories();
-        renderEmergency();
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
