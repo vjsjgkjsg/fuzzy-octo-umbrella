@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>BOT DEVELOPER SYSTEM</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+
+<!-- ===== LOADING SCREEN ===== -->
+<div id="loader">
+  <div class="loader-inner">
+    <div class="loader-logo">
+      <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+        <polygon points="32,4 60,18 60,46 32,60 4,46 4,18" stroke="#00ff88" stroke-width="2" fill="none" class="hex-anim"/>
+        <polygon points="32,12 52,22 52,42 32,52 12,42 12,22" stroke="#00d9ff" stroke-width="1" fill="none" class="hex-anim2"/>
+        <text x="32" y="36" text-anchor="middle" fill="#00ff88" font-size="14" font-family="monospace" font-weight="bold">BDS</text>
+      </svg>
+    </div>
+    <div class="loader-text">BOT DEVELOPER SYSTEM</div>
+    <div class="loader-bar-wrap"><div class="loader-bar"></div></div>
+    <div class="loader-status" id="loaderStatus">Initializing system...</div>
+  </div>
+</div>
+
+<!-- ===== CANVAS ===== -->
+<canvas id="bgCanvas"></canvas>
+
+<!-- ===== APP SHELL ===== -->
+<div id="app" class="hidden">
+
+  <!-- ========== HOME ========== -->
+  <section class="page active" id="page-home">
+    <div class="page-scroll">
+      <div class="hero">
+        <div class="hero-badge"><span class="dot pulse-green"></span> SYSTEM ONLINE</div>
+        <div class="logo-wrap">
+          <svg width="72" height="72" viewBox="0 0 72 72" fill="none">
+            <polygon points="36,4 68,20 68,52 36,68 4,52 4,20" stroke="#00ff88" stroke-width="1.5" fill="rgba(0,255,136,0.04)"/>
+            <polygon points="36,14 58,26 58,50 36,62 14,50 14,26" stroke="#00d9ff" stroke-width="1" fill="rgba(0,217,255,0.03)"/>
+            <text x="36" y="42" text-anchor="middle" fill="#00ff88" font-size="16" font-family="monospace" font-weight="bold">BDS</text>
+          </svg>
+        </div>
+        <h1 class="hero-title glitch" data-text="BOT DEVELOPER SYSTEM">BOT DEVELOPER SYSTEM</h1>
+        <p class="hero-sub typed-text" id="typedSub"></p>
+        <div class="hero-actions">
+          <button class="btn-primary" onclick="nav('services')">Смотреть услуги</button>
+          <button class="btn-outline" onclick="nav('contacts')">Связаться</button>
+        </div>
+      </div>
+
+      <!-- STATS -->
+      <div class="section-label">// SYSTEM METRICS</div>
+      <div class="stats-grid">
+        <div class="stat-card" data-glow="green">
+          <div class="stat-icon">📦</div>
+          <div class="stat-num counter" data-target="120">0</div>
+          <div class="stat-label">Выполнено проектов</div>
+          <div class="stat-bar"><div class="stat-bar-fill" style="width:92%"></div></div>
+        </div>
+        <div class="stat-card" data-glow="blue">
+          <div class="stat-icon">👥</div>
+          <div class="stat-num counter" data-target="47">0</div>
+          <div class="stat-label">Активных клиентов</div>
+          <div class="stat-bar"><div class="stat-bar-fill" style="width:78%"></div></div>
+        </div>
+        <div class="stat-card" data-glow="green">
+          <div class="stat-icon">⚡</div>
+          <div class="stat-num" id="responseTime">~2ч</div>
+          <div class="stat-label">Время ответа</div>
+          <div class="stat-bar"><div class="stat-bar-fill" style="width:98%"></div></div>
+        </div>
+        <div class="stat-card" data-glow="blue">
+          <div class="stat-icon">🟢</div>
+          <div class="stat-num" style="color:#00ff88">ONLINE</div>
+          <div class="stat-label">Онлайн статус</div>
+          <div class="stat-bar"><div class="stat-bar-fill" style="width:100%"></div></div>
+        </div>
+      </div>
+
+      <!-- ABOUT -->
+      <div class="section-label">// ABOUT SYSTEM</div>
+      <div class="about-card glass">
+        <div class="about-icon">🤖</div>
+        <div class="about-text">
+          <p>Разрабатываю <span class="highlight-green">Telegram-боты</span> любой сложности — от простых автоответчиков до полноценных <span class="highlight-blue">CRM-систем</span> и магазинов. Работаю с Python, Node.js, aiogram, Telegraf и другими стеками.</p>
+        </div>
+      </div>
+
+      <!-- TECH STACK -->
+      <div class="section-label">// TECH STACK</div>
+      <div class="tech-wrap">
+        <div class="tech-tag">Python</div>
+        <div class="tech-tag">aiogram</div>
+        <div class="tech-tag">Node.js</div>
+        <div class="tech-tag">Telegraf</div>
+        <div class="tech-tag">PostgreSQL</div>
+        <div class="tech-tag">Redis</div>
+        <div class="tech-tag">Docker</div>
+        <div class="tech-tag">REST API</div>
+        <div class="tech-tag">Webhook</div>
+        <div class="tech-tag">MongoDB</div>
+        <div class="tech-tag">FastAPI</div>
+        <div class="tech-tag">OpenAI</div>
+      </div>
+
+      <div class="spacer-bottom"></div>
+    </div>
+  </section>
+
+  <!-- ========== SERVICES ========== -->
+  <section class="page" id="page-services">
+    <div class="page-scroll">
+      <div class="page-header">
+        <div class="page-header-label">// AVAILABLE MODULES</div>
+        <h2 class="page-title">Услуги</h2>
+        <p class="page-desc">Выберите нужное решение для вашего бизнеса</p>
+      </div>
+
+      <div class="services-grid" id="servicesGrid"></div>
+      <div class="spacer-bottom"></div>
+    </div>
+  </section>
+
+  <!-- ========== PORTFOLIO ========== -->
+  <section class="page" id="page-portfolio">
+    <div class="page-scroll">
+      <div class="page-header">
+        <div class="page-header-label">// PROJECT ARCHIVE</div>
+        <h2 class="page-title">Портфолио</h2>
+        <p class="page-desc">Реализованные проекты</p>
+      </div>
+
+      <div class="portfolio-list" id="portfolioList"></div>
+      <div class="spacer-bottom"></div>
+    </div>
+  </section>
+
+  <!-- ========== REVIEWS ========== -->
+  <section class="page" id="page-reviews">
+    <div class="page-scroll">
+      <div class="page-header">
+        <div class="page-header-label">// CLIENT FEEDBACK</div>
+        <h2 class="page-title">Отзывы</h2>
+        <p class="page-desc">Что говорят клиенты</p>
+      </div>
+
+      <div class="reviews-list" id="reviewsList"></div>
+      <div class="spacer-bottom"></div>
+    </div>
+  </section>
+
+  <!-- ========== CONTACTS ========== -->
+  <section class="page" id="page-contacts">
+    <div class="page-scroll">
+      <div class="page-header">
+        <div class="page-header-label">// ESTABLISH CONNECTION</div>
+        <h2 class="page-title">Контакты</h2>
+        <p class="page-desc">Готов обсудить ваш проект</p>
+      </div>
+
+      <div class="contacts-wrap">
+        <a href="https://t.me/yourusername" class="contact-card glass" data-glow="blue">
+          <div class="contact-icon">✈️</div>
+          <div class="contact-info">
+            <div class="contact-name">Telegram</div>
+            <div class="contact-val">@yourusername</div>
+          </div>
+          <div class="contact-arrow">→</div>
+        </a>
+        <a href="https://wa.me/79000000000" class="contact-card glass" data-glow="green">
+          <div class="contact-icon">💬</div>
+          <div class="contact-info">
+            <div class="contact-name">WhatsApp</div>
+            <div class="contact-val">+7 (900) 000-00-00</div>
+          </div>
+          <div class="contact-arrow">→</div>
+        </a>
+        <a href="mailto:dev@example.com" class="contact-card glass" data-glow="blue">
+          <div class="contact-icon">📧</div>
+          <div class="contact-info">
+            <div class="contact-name">Email</div>
+            <div class="contact-val">dev@example.com</div>
+          </div>
+          <div class="contact-arrow">→</div>
+        </a>
+      </div>
+
+      <div class="section-label" style="margin-top:28px">// AVAILABILITY STATUS</div>
+      <div class="avail-card glass">
+        <div class="avail-dot pulse-green"></div>
+        <div class="avail-text">
+          <div class="avail-title">Принимаю новые проекты</div>
+          <div class="avail-sub">Свободные слоты: <span class="highlight-green">3 из 5</span></div>
+        </div>
+      </div>
+
+      <button class="btn-primary btn-wide" onclick="openModal('general')" style="margin-top:24px">
+        📩 Связаться сейчас
+      </button>
+      <div class="spacer-bottom"></div>
+    </div>
+  </section>
+
+  <!-- ========== NAV ========== -->
+  <nav class="bottom-nav" id="bottomNav">
+    <button class="nav-item active" data-page="home">
+      <span class="nav-icon">🏠</span>
+      <span class="nav-label">Главная</span>
+    </button>
+    <button class="nav-item" data-page="services">
+      <span class="nav-icon">🤖</span>
+      <span class="nav-label">Услуги</span>
+    </button>
+    <button class="nav-item" data-page="portfolio">
+      <span class="nav-icon">📂</span>
+      <span class="nav-label">Портфолио</span>
+    </button>
+    <button class="nav-item" data-page="reviews">
+      <span class="nav-icon">💬</span>
+      <span class="nav-label">Отзывы</span>
+    </button>
+    <button class="nav-item" data-page="contacts">
+      <span class="nav-icon">📞</span>
+      <span class="nav-label">Контакты</span>
+    </button>
+  </nav>
+</div>
+
+<!-- ===== MODAL ===== -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal()">
+  <div class="modal glass" id="modalBox" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title">// SEND REQUEST</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody">
+      <form id="orderForm" onsubmit="submitForm(event)">
+        <label class="field-label">Имя *</label>
+        <input class="field-input" type="text" id="fName" placeholder="Ваше имя" required />
+
+        <label class="field-label">Telegram *</label>
+        <input class="field-input" type="text" id="fTg" placeholder="@username" required />
+
+        <label class="field-label">Тип проекта</label>
+        <select class="field-input" id="fType">
+          <option value="">Выберите...</option>
+          <option>Telegram бот</option>
+          <option>Магазин в Telegram</option>
+          <option>CRM система</option>
+          <option>Автоматическая рассылка</option>
+          <option>Парсер данных</option>
+          <option>Интеграция API</option>
+          <option>Автоматизация бизнеса</option>
+          <option>Индивидуальная разработка</option>
+        </select>
+
+        <label class="field-label">Описание задачи</label>
+        <textarea class="field-input" id="fDesc" rows="3" placeholder="Опишите вашу задачу..."></textarea>
+
+        <label class="field-label">Бюджет</label>
+        <select class="field-input" id="fBudget">
+          <option value="">Не указан</option>
+          <option>До 5 000 ₽</option>
+          <option>5 000 – 15 000 ₽</option>
+          <option>15 000 – 50 000 ₽</option>
+          <option>50 000 – 100 000 ₽</option>
+          <option>Более 100 000 ₽</option>
+        </select>
+
+        <button class="btn-primary btn-wide" type="submit">Отправить заявку →</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SUCCESS TOAST ===== -->
+<div class="toast" id="successToast">
+  <span class="toast-icon">✅</span>
+  <span>Заявка успешно отправлена!</span>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
