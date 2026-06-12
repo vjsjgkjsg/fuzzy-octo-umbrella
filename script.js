@@ -52,7 +52,7 @@ function renderCategories(filterText = "") {
         card.className = 'card';
         if (!matches) card.classList.add('hidden');
         card.innerHTML = `<div class="icon">${cat.icon}</div><div class="title">${cat.title}</div><div class="desc">${cat.desc}</div>`;
-        card.onclick = () => alert(`Открыт раздел: ${cat.title}`);
+        card.onclick = () => openCategory(cat.title, cat.tags);
         grid.appendChild(card);
     });
 }
@@ -74,7 +74,7 @@ function renderEmergency() {
     });
 }
 
-// Фильтрация карточек
+// Фильтрация карточек при вводе в поиск
 function filterCards() {
     const input = document.getElementById('mainSearch');
     if (input) renderCategories(input.value);
@@ -87,7 +87,7 @@ function toggleTheme() {
     if (btn) btn.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
 }
 
-// Режим скорой
+// Переключение режима скорой
 function toggleEmergencyMode() {
     emergencyMode = !emergencyMode;
     const btn = document.getElementById('emergencyModeBtn');
@@ -121,6 +121,37 @@ function switchTab(tab) {
     document.querySelectorAll('.tab-item').forEach(item => {
         if (item.dataset.tab === tab) item.classList.add('active');
     });
+}
+
+// Открыть экран категории
+function openCategory(title, tags) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    const categoryScreen = document.getElementById('categoryScreen');
+    const titleEl = document.getElementById('categoryTitle');
+    const contentEl = document.getElementById('categoryContent');
+    
+    if (titleEl) titleEl.textContent = title;
+    if (contentEl) {
+        // Заглушка контента, в будущем здесь будет подгружаться нужный раздел
+        contentEl.innerHTML = `<div class="placeholder">Раздел «${title}» в разработке</div>`;
+    }
+    if (categoryScreen) categoryScreen.classList.add('active');
+    
+    // Убираем активность с таб-бара
+    document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+}
+
+// Закрыть категорию и вернуться на главный экран
+function closeCategory() {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('homeScreen').classList.add('active');
+    document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+    const homeTab = document.querySelector('.tab-item[data-tab="home"]');
+    if (homeTab) homeTab.classList.add('active');
+    // Очищаем поиск и перерисовываем категории полностью
+    const searchInput = document.getElementById('mainSearch');
+    if (searchInput) searchInput.value = '';
+    renderCategories();
 }
 
 // Модальное окно экстренной помощи
@@ -196,6 +227,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (tab) switchTab(tab);
         });
     });
+
+    // Кнопка "Назад" из раздела
+    const backBtn = document.getElementById('backFromCategory');
+    if (backBtn) backBtn.addEventListener('click', closeCategory);
 
     // Первоначальный рендер
     renderCategories();
