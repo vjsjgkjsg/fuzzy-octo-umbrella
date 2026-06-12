@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Первая помощь – MedPocket KZ</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Стили для раздела первой помощи (аналогичны emergency, но с зелёным акцентом) */
+        :root {
+            --aid-primary: #2E7D32; /* Зелёный вместо красного */
+            --aid-light: #E8F5E9;
+            --aid-border: #A5D6A7;
+        }
+        body.dark {
+            --aid-primary: #66BB6A;
+            --aid-light: #1B5E20;
+            --aid-border: #388E3C;
+        }
+        .aid-container {
+            padding: 0 0 20px;
+        }
+        .category-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 16px;
+            padding: 0 16px;
+        }
+        .category-tab {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+            white-space: nowrap;
+        }
+        .category-tab.active {
+            background: var(--aid-primary);
+            color: white;
+            border-color: var(--aid-primary);
+        }
+        .aid-search {
+            background: var(--card-bg);
+            border-radius: 14px;
+            padding: 8px 14px;
+            display: flex;
+            align-items: center;
+            margin: 0 16px 16px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+        }
+        .aid-search input {
+            border: none;
+            background: transparent;
+            font-size: 16px;
+            padding: 8px 0;
+            outline: none;
+            flex: 1;
+            color: var(--text);
+        }
+        .aid-search input::placeholder {
+            color: var(--subtext);
+        }
+        .conditions-list {
+            padding: 0 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .condition-item {
+            background: var(--card-bg);
+            border-radius: 14px;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+        .condition-item:active {
+            transform: scale(0.98);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .condition-item .cond-icon {
+            font-size: 28px;
+            width: 40px;
+            text-align: center;
+        }
+        .condition-item .cond-info {
+            flex: 1;
+        }
+        .condition-item .cond-name {
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--text);
+            margin-bottom: 2px;
+        }
+        .condition-item .cond-desc {
+            font-size: 12px;
+            color: var(--subtext);
+        }
+        .condition-item .cond-arrow {
+            color: var(--subtext);
+            font-size: 18px;
+        }
+        .detail-screen {
+            padding: 0 16px 20px;
+        }
+        .detail-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 20px;
+            border: 2px solid var(--aid-primary);
+            margin-bottom: 20px;
+        }
+        .detail-card h2 {
+            color: var(--aid-primary);
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .detail-card .mkb {
+            color: var(--subtext);
+            font-size: 14px;
+            margin-bottom: 16px;
+            font-weight: 500;
+        }
+        .detail-card .step {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 14px;
+            align-items: flex-start;
+        }
+        .detail-card .step-num {
+            background: var(--aid-primary);
+            color: white;
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .detail-card .step-text {
+            font-size: 16px;
+            color: var(--text);
+            line-height: 1.5;
+            font-weight: 500;
+        }
+        .detail-card .step-text strong {
+            color: var(--aid-primary);
+        }
+        .call-btn {
+            background: var(--aid-primary);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            padding: 14px;
+            font-weight: 700;
+            font-size: 16px;
+            margin-top: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            transition: background 0.2s;
+        }
+        .call-btn:active {
+            background: #1B5E20;
+        }
+        .empty-message {
+            text-align: center;
+            color: var(--subtext);
+            padding: 30px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header class="header">
+            <div class="logo">MedPocket KZ</div>
+            <div class="header-icons">
+                <span>🔔</span>
+                <button class="theme-toggle" id="themeToggle">🌙</button>
+                <span>⚙️</span>
+            </div>
+        </header>
+
+        <main class="content">
+            <!-- Экран со списком -->
+            <section id="listScreen" class="screen active">
+                <div class="category-header" style="padding: 16px 16px 0;">
+                    <span class="back-button" onclick="goBackToMain()">← Назад</span>
+                    <h2 class="category-title">🩺 Первая помощь</h2>
+                </div>
+
+                <!-- Категории -->
+                <div class="category-tabs" id="categoryTabs">
+                    <div class="category-tab active" data-category="all">Все</div>
+                    <div class="category-tab" data-category="heart">❤️ Сердце</div>
+                    <div class="category-tab" data-category="bleeding">🩸 Кровотечения</div>
+                    <div class="category-tab" data-category="trauma">🦴 Травмы</div>
+                    <div class="category-tab" data-category="burns">🔥 Ожоги</div>
+                    <div class="category-tab" data-category="poison">☠️ Отравления</div>
+                    <div class="category-tab" data-category="kids">👶 Дети</div>
+                    <div class="category-tab" data-category="other">📦 Прочее</div>
+                </div>
+
+                <!-- Поиск -->
+                <div class="aid-search">
+                    <input type="text" placeholder="🔍 Поиск по первой помощи..." id="conditionSearch">
+                </div>
+
+                <!-- Список -->
+                <div class="conditions-list" id="conditionsList"></div>
+                <div class="empty-message" id="emptyMessage" style="display: none;">Ничего не найдено</div>
+            </section>
+
+            <!-- Экран детальной карточки -->
+            <section id="detailScreen" class="screen detail-screen">
+                <div class="category-header" style="padding: 16px 0 0;">
+                    <span class="back-button" onclick="showList()">← К списку</span>
+                    <h2 class="category-title" id="detailTitle">Алгоритм</h2>
+                </div>
+                <div id="detailContainer"></div>
+            </section>
+        </main>
+
+        <nav class="tab-bar">
+            <div class="tab-item" onclick="goBackToMain()">🏠</div>
+            <div class="tab-item">🔍</div>
+            <div class="tab-item">⭐</div>
+            <div class="tab-item">👤</div>
+        </nav>
+    </div>
+
+    <script>
+        // База данных первой помощи (основана на стандартах МЗ РК и международных рекомендациях)
+        const conditions = [
+            // Сердце
+            {
+                id: 1,
+                name: "Базовая сердечно-лёгочная реанимация (СЛР)",
+                icon: "🫀",
+                category: "heart",
+                desc: "Для взрослых и детей старше 8 лет",
+                steps: [
+                    "Убедиться в безопасности. Проверить реакцию: громко окликнуть, потрясти за плечо.",
+                    "Если нет реакции – вызвать скорую (103), попросить окружающих принести автоматический дефибриллятор (АНД).",
+                    "Начать компрессии грудной клетки: основание ладони в центр груди, глубина 5-6 см, частота 100-120 в минуту. 30 надавливаний.",
+                    "Открыть дыхательные пути (запрокинуть голову, поднять подбородок).",
+                    "Сделать 2 вдоха (рот в рот или через маску) длительностью 1 секунда, наблюдая за подъёмом грудной клетки.",
+                    "Продолжать циклы 30:2 до прибытия помощи или появления признаков жизни.",
+                    "При наличии АНД включить его и следовать голосовым инструкциям."
+                ]
+            },
+            {
+                id: 2,
+                name: "Восстановительное положение",
+                icon: "🛌",
+                category: "heart",
+                desc: "При бессознательном состоянии с сохранённым дыханием",
+                steps: [
+                    "Снять очки, вынуть предметы из карманов.",
+                    "Встать на колени сбоку от пострадавшего.",
+                    "Ближнюю руку выпрямить под прямым углом к телу, ладонью вверх.",
+                    "Дальнюю руку взять своей рукой и приложить тыльной стороной ладони к противоположной щеке пострадавшего, удерживая её.",
+                    "Второй рукой захватить дальнее бедро под коленом и повернуть пострадавшего на себя, толкая бедро.",
+                    "Убедиться, что голова запрокинута, дыхательные пути открыты. Контролировать дыхание."
+                ]
+            },
+
+            // Кровотечения
+            {
+                id: 3,
+                name: "Наружное артериальное кровотечение",
+                icon: "🩸",
+                category: "bleeding",
+                desc: "Ярко-алая кровь, пульсирующая струя",
+                steps: [
+                    "Немедленно прижать артерию пальцем или кулаком выше места ранения (плечевая – на внутренней поверхности плеча, бедренная – в паху).",
+                    "Наложить кровоостанавливающий жгут: на 5-7 см выше раны, на одежду или мягкую прокладку.",
+                    "Затянуть жгут до остановки кровотечения. Зафиксировать время наложения (записка под жгут).",
+                    "Жгут не закрывать повязкой. Время наложения не более 1 часа летом, 30 минут зимой.",
+                    "При отсутствии жгута использовать закрутку (платок, ремень, палка).",
+                    "Вызвать скорую, обеспечить неподвижность конечности."
+                ]
+            },
+            {
+                id: 4,
+                name: "Венозное и капиллярное кровотечение",
+                icon: "🩹",
+                category: "bleeding",
+                desc: "Тёмная кровь, равномерное истечение",
+                steps: [
+                    "Обработать кожу вокруг раны антисептиком (йод, перекись водорода).",
+                    "Наложить стерильную давящую повязку.",
+                    "При промокании повязки не снимать, а добавить ещё слои сверху.",
+                    "Обеспечить покой повреждённой области.",
+                    "При необходимости обратиться в травмпункт."
+                ]
+            },
+
+            // Травмы
+            {
+                id: 5,
+                name: "Переломы конечностей",
+                icon: "🦴",
+                category: "trauma",
+                desc: "Иммобилизация подручными средствами",
+                steps: [
+                    "Оценить ситуацию, не перемещать пострадавшего без крайней необходимости.",
+                    "Обеспечить неподвижность двух соседних суставов (выше и ниже перелома).",
+                    "Использовать шины: доски, палки, картон. Подложить мягкую ткань.",
+                    "При открытом переломе – сначала остановить кровотечение и наложить стерильную повязку на рану.",
+                    "Не пытаться вправлять отломки!",
+                    "При переломе бедра шина накладывается от подмышки до пятки.",
+                    "Вызвать скорую, обеспечить тепло."
+                ]
+            },
+            {
+                id: 6,
+                name: "Травма позвоночника",
+                icon: "🚑",
+                category: "trauma",
+                desc: "Подозрение на повреждение спины или шеи",
+                steps: [
+                    "Немедленно вызвать скорую. Не перемещать пострадавшего.",
+                    "Зафиксировать голову в нейтральном положении руками или подручными средствами (валики, одежда).",
+                    "Не запрокидывать голову при проверке дыхания – использовать выдвижение нижней челюсти.",
+                    "При рвоте осторожно повернуть пострадавшего на бок как единое целое, сохраняя ось позвоночника.",
+                    "До прибытия скорой укрыть, контролировать сознание и дыхание."
+                ]
+            },
+            {
+                id: 7,
+                name: "Вывихи и растяжения",
+                icon: "🦵",
+                category: "trauma",
+                desc: "Боль, отёк, деформация сустава",
+                steps: [
+                    "Не пытаться вправлять вывих самостоятельно!",
+                    "Обеспечить покой конечности, наложить фиксирующую повязку (косыночную).",
+                    "Приложить холод (лёд через ткань) на 15-20 минут.",
+                    "Дать обезболивающее (ибупрофен, парацетамол) при необходимости.",
+                    "Обратиться в травмпункт."
+                ]
+            },
+
+            // Ожоги и отморожения
+            {
+                id: 8,
+                name: "Термический ожог",
+                icon: "🔥",
+                category: "burns",
+                desc: "Ожоги 1-й и 2-й степени",
+                steps: [
+                    "Убрать источник тепла, охладить обожжённое место проточной водой (температура 15-25°C) не менее 10-15 минут.",
+                    "Не использовать лёд, масло, сметану!",
+                    "Аккуратно снять одежду с обожжённой области (не отрывать прилипшую).",
+                    "Наложить сухую стерильную повязку или чистую ткань.",
+                    "При ожогах лица, кистей, стоп, промежности или обширных ожогах (>10% тела) – вызвать скорую.",
+                    "Дать обильное питьё, обезболивающее."
+                ]
+            },
+            {
+                id: 9,
+                name: "Отморожение",
+                icon: "❄️",
+                category: "burns",
+                desc: "Побледнение, потеря чувствительности",
+                steps: [
+                    "Переместить пострадавшего в тепло, снять мокрую одежду.",
+                    "Согревать поражённые участки медленно: поместить в тёплую (не горячую!) воду 37-40°C на 20-30 минут.",
+                    "Не растирать снегом, не использовать горячие грелки!",
+                    "Дать тёплое питьё, обезболивающее.",
+                    "Наложить утепляющую повязку (вата, марля, шерсть).",
+                    "При появлении пузырей – не вскрывать, обратиться к врачу."
+                ]
+            },
+
+            // Отравления
+            {
+                id: 10,
+                name: "Пищевое отравление",
+                icon: "🤢",
+                category: "poison",
+                desc: "Тошнота, рвота, диарея",
+                steps: [
+                    "Промыть желудок: выпить 1-1,5 л тёплой воды или слабого раствора марганцовки, вызвать рвоту нажатием на корень языка.",
+                    "Принять активированный уголь: 1 г/кг веса, размельчённый в воде.",
+                    "Обеспечить обильное питьё (регидрон, минеральная вода без газа) для предотвращения обезвоживания.",
+                    "При высокой температуре, неукротимой рвоте, крови в стуле, нарушении сознания – вызвать скорую.",
+                    "Не принимать противорвотные без назначения врача."
+                ]
+            },
+            {
+                id: 11,
+                name: "Отравление угарным газом",
+                icon: "🚗",
+                category: "poison",
+                desc: "Головная боль, тошнота, спутанность сознания",
+                steps: [
+                    "Немедленно вынести пострадавшего на свежий воздух, открыть все окна.",
+                    "Вызвать скорую.",
+                    "При отсутствии дыхания начать СЛР.",
+                    "Уложить, расстегнуть стесняющую одежду, обеспечить покой.",
+                    "При наличии сознания дать горячий чай."
+                ]
+            },
+
+            // Дети
+            {
+                id: 12,
+                name: "СЛР у детей (1-8 лет)",
+                icon: "👶🫀",
+                category: "kids",
+                desc: "Компрессии одной рукой",
+                steps: [
+                    "Проверить реакцию, вызвать скорую после 1 минуты реанимации (если вы один).",
+                    "Компрессии: основанием ладони (или двумя пальцами у младенцев), глубина ~4-5 см, частота 100-120/мин.",
+                    "Соотношение компрессий и вдохов 30:2 (один спасатель) или 15:2 (двое).",
+                    "Использовать детские электроды АНД при наличии.",
+                    "Продолжать до прибытия помощи."
+                ]
+            },
+            {
+                id: 13,
+                name: "Инородное тело в дыхательных путях (приём Геймлиха)",
+                icon: "🗣️",
+                category: "kids",
+                desc: "Ребёнок или взрослый задыхается",
+                steps: [
+                    "Встать сзади пострадавшего, обхватить руками вокруг талии.",
+                    "Одну руку сжать в кулак и приложить большим пальцем к эпигастрии (ниже грудины).",
+                    "Второй рукой обхватить кулак и сделать резкое нажатие внутрь и вверх.",
+                    "Повторить до 5 раз, затем проверить рот (удалить видимое инородное тело).",
+                    "При неэффективности – чередовать 5 толчков и 5 попыток удаления изо рта.",
+                    "Младенцам до года: уложить лицом вниз на предплечье, произвести 5 похлопываний между лопаток."
+                ]
+            },
+
+            // Прочие
+            {
+                id: 14,
+                name: "Укусы животных и змей",
+                icon: "🐍",
+                category: "other",
+                desc: "Собаки, кошки, змеи",
+                steps: [
+                    "Промыть рану большим количеством воды с мылом.",
+                    "Обработать края раны антисептиком (не спиртом!).",
+                    "Наложить чистую повязку.",
+                    "При укусе змеи: обеспечить неподвижность укушенной конечности, уложить пострадавшего, дать обильное питьё.",
+                    "Не отсасывать яд, не накладывать жгут!",
+                    "Срочно обратиться в травмпункт для введения противостолбнячной сыворотки и специфического лечения."
+                ]
+            },
+            {
+                id: 15,
+                name: "Тепловой удар",
+                icon: "☀️",
+                category: "other",
+                desc: "Перегрев, потеря сознания, высокая температура",
+                steps: [
+                    "Переместить в прохладное место, уложить, приподнять голову.",
+                    "Освободить от одежды, обернуть влажной простыней, обдувать вентилятором.",
+                    "Прикладывать холодные компрессы на шею, подмышки, пах.",
+                    "Давать прохладную воду маленькими глотками, если в сознании.",
+                    "При потере сознания, судорогах – вызвать скорую."
+                ]
+            },
+            {
+                id: 16,
+                name: "Утопление",
+                icon: "🌊",
+                category: "other",
+                desc: "Извлечение из воды и реанимация",
+                steps: [
+                    "Обеспечить собственную безопасность, извлечь пострадавшего из воды (подплыть сзади).",
+                    "Вызвать скорую.",
+                    "Проверить дыхание. При отсутствии – начать СЛР с 5 вдохов, затем циклы 30:2.",
+                    "Не тратить время на удаление воды из лёгких (она всасывается быстро).",
+                    "Укрыть, согреть, контролировать до прибытия медиков."
+                ]
+            },
+            {
+                id: 17,
+                name: "Электротравма",
+                icon: "⚡",
+                category: "other",
+                desc: "Поражение током, ожоги, остановка сердца",
+                steps: [
+                    "Обесточить источник (выключить рубильник, отбросить провод сухой палкой, не прикасаясь к пострадавшему).",
+                    "Вызвать скорую.",
+                    "При отсутствии дыхания/пульса – начать СЛР.",
+                    "Обработать ожоги в местах входа/выхода тока сухой стерильной повязкой.",
+                    "Обеспечить покой, укрыть."
+                ]
+            },
+            {
+                id: 18,
+                name: "Обморок",
+                icon: "😵",
+                category: "other",
+                desc: "Кратковременная потеря сознания",
+                steps: [
+                    "Уложить пострадавшего на спину, ноги приподнять на 30-40 см (если нет травмы).",
+                    "Обеспечить приток свежего воздуха, расстегнуть ворот.",
+                    "Дать понюхать нашатырный спирт (осторожно, не ближе 1-2 см от ноздрей).",
+                    "После возвращения сознания – не разрешать резко вставать, предложить сладкий чай.",
+                    "Если обморок длится более 3-5 минут – вызвать скорую."
+                ]
+            },
+            {
+                id: 19,
+                name: "Носовое кровотечение",
+                icon: "👃",
+                category: "other",
+                desc: "Остановка в домашних условиях",
+                steps: [
+                    "Усадить пострадавшего, слегка наклонив голову вперёд (чтобы кровь не затекала в горло).",
+                    "Зажать крылья носа пальцами на 10-15 минут.",
+                    "На переносицу положить холод (лёд в ткани).",
+                    "Не запрокидывать голову назад!",
+                    "Если кровотечение не останавливается более 20 минут – вызвать скорую."
+                ]
+            },
+            {
+                id: 20,
+                name: "Помощь при приступе эпилепсии",
+                icon: "🧠",
+                category: "other",
+                desc: "Действия во время судорог",
+                steps: [
+                    "Не удерживать пострадавшего, не разжимать челюсти!",
+                    "Убрать окружающие предметы, подложить мягкое под голову.",
+                    "После прекращения судорог повернуть на бок для предотвращения западания языка.",
+                    "Вызвать скорую, если приступ длится более 5 минут или это первый приступ.",
+                    "Оставаться с человеком до полного восстановления сознания."
+                ]
+            }
+        ];
+
+        // Рендер списка с учётом фильтров
+        function renderList(category = 'all', search = '') {
+            const list = document.getElementById('conditionsList');
+            const empty = document.getElementById('emptyMessage');
+            list.innerHTML = '';
+            let filtered = conditions;
+
+            if (category !== 'all') {
+                filtered = filtered.filter(c => c.category === category);
+            }
+            if (search) {
+                const s = search.toLowerCase();
+                filtered = filtered.filter(c => c.name.toLowerCase().includes(s) || c.desc.toLowerCase().includes(s));
+            }
+
+            if (filtered.length === 0) {
+                empty.style.display = 'block';
+                return;
+            } else {
+                empty.style.display = 'none';
+            }
+
+            filtered.forEach(cond => {
+                const item = document.createElement('div');
+                item.className = 'condition-item';
+                item.innerHTML = `
+                    <div class="cond-icon">${cond.icon}</div>
+                    <div class="cond-info">
+                        <div class="cond-name">${cond.name}</div>
+                        <div class="cond-desc">${cond.desc}</div>
+                    </div>
+                    <div class="cond-arrow">›</div>
+                `;
+                item.onclick = () => showDetail(cond.id);
+                list.appendChild(item);
+            });
+        }
+
+        function showDetail(id) {
+            const cond = conditions.find(c => c.id === id);
+            if (!cond) return;
+            document.getElementById('listScreen').classList.remove('active');
+            document.getElementById('detailScreen').classList.add('active');
+            document.getElementById('detailTitle').textContent = cond.name;
+
+            let stepsHtml = cond.steps.map((step, i) => `
+                <div class="step">
+                    <div class="step-num">${i + 1}</div>
+                    <div class="step-text">${step}</div>
+                </div>
+            `).join('');
+
+            document.getElementById('detailContainer').innerHTML = `
+                <div class="detail-card">
+                    <h2>${cond.icon} ${cond.name}</h2>
+                    <div class="mkb">${cond.desc}</div>
+                    ${stepsHtml}
+                    <button class="call-btn" onclick="callAmbulance()">📞 Вызвать скорую (103)</button>
+                </div>
+            `;
+        }
+
+        function showList() {
+            document.getElementById('detailScreen').classList.remove('active');
+            document.getElementById('listScreen').classList.add('active');
+        }
+
+        function goBackToMain() {
+            window.location.href = 'index.html';
+        }
+
+        function callAmbulance() {
+            alert('Вызов 103... (имитация)');
+        }
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    const cat = tab.dataset.category;
+                    const search = document.getElementById('conditionSearch').value;
+                    renderList(cat, search);
+                });
+            });
+
+            document.getElementById('conditionSearch').addEventListener('input', (e) => {
+                const activeCat = document.querySelector('.category-tab.active')?.dataset.category || 'all';
+                renderList(activeCat, e.target.value);
+            });
+
+            renderList();
+        });
+    </script>
+</body>
+</html>
