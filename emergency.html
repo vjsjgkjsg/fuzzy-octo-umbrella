@@ -4,69 +4,134 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Неотложные состояния – MedPocket KZ</title>
-    <!-- Общие стили приложения -->
     <link rel="stylesheet" href="style.css">
-    <!-- Дополнительные стили именно для этого раздела -->
     <style>
-        /* Список неотложных состояний */
-        .emergency-list {
+        /* Стили только для этого раздела */
+        .emergency-container {
+            padding: 0 0 20px;
+        }
+        .category-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 16px;
+            padding: 0 16px;
+        }
+        .category-tab {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+            white-space: nowrap;
+        }
+        .category-tab.active {
+            background: var(--danger);
+            color: white;
+            border-color: var(--danger);
+        }
+        .emergency-search {
+            background: var(--card-bg);
+            border-radius: 14px;
+            padding: 8px 14px;
+            display: flex;
+            align-items: center;
+            margin: 0 16px 16px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+        }
+        .emergency-search input {
+            border: none;
+            background: transparent;
+            font-size: 16px;
+            padding: 8px 0;
+            outline: none;
+            flex: 1;
+            color: var(--text);
+        }
+        .emergency-search input::placeholder {
+            color: var(--subtext);
+        }
+        .conditions-list {
+            padding: 0 16px;
             display: flex;
             flex-direction: column;
             gap: 10px;
-            margin-top: 10px;
         }
-        .emergency-list-item {
+        .condition-item {
             background: var(--card-bg);
-            border: 1px solid var(--emergency-item-border);
             border-radius: 14px;
             padding: 14px 16px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
             cursor: pointer;
-            transition: transform 0.1s, background 0.2s;
-            color: #B91C1C;
-            font-weight: 600;
+            border: 1px solid var(--border);
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+        .condition-item:active {
+            transform: scale(0.98);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .condition-item .cond-icon {
+            font-size: 28px;
+            width: 40px;
+            text-align: center;
+        }
+        .condition-item .cond-info {
+            flex: 1;
+        }
+        .condition-item .cond-name {
+            font-weight: 700;
             font-size: 16px;
+            color: var(--text);
+            margin-bottom: 2px;
         }
-        .emergency-list-item:active {
-            transform: scale(0.97);
-            background: var(--emergency-item-bg);
+        .condition-item .cond-mkb {
+            font-size: 12px;
+            color: var(--subtext);
         }
-        .emergency-list-item .emoji {
-            font-size: 24px;
+        .condition-item .cond-arrow {
+            color: var(--subtext);
+            font-size: 18px;
         }
-
-        /* Карточка детального алгоритма */
-        .emergency-detail {
+        /* Детальная карточка */
+        .detail-screen {
+            padding: 0 16px 20px;
+        }
+        .detail-card {
             background: var(--card-bg);
             border-radius: 20px;
             padding: 20px;
             border: 2px solid var(--danger);
-            margin-top: 10px;
+            margin-bottom: 20px;
         }
-        .emergency-detail h2 {
+        .detail-card h2 {
             color: var(--danger);
             font-size: 22px;
             font-weight: 800;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             display: flex;
             align-items: center;
             gap: 10px;
         }
-        .emergency-detail .mkb {
+        .detail-card .mkb {
             color: var(--subtext);
             font-size: 14px;
             margin-bottom: 16px;
             font-weight: 500;
         }
-        .emergency-detail .step {
+        .detail-card .step {
             display: flex;
             gap: 10px;
             margin-bottom: 14px;
             align-items: flex-start;
         }
-        .emergency-detail .step-num {
+        .detail-card .step-num {
             background: var(--danger);
             color: white;
             border-radius: 50%;
@@ -80,16 +145,16 @@
             flex-shrink: 0;
             margin-top: 2px;
         }
-        .emergency-detail .step-text {
+        .detail-card .step-text {
             font-size: 16px;
             color: var(--text);
             line-height: 1.5;
             font-weight: 500;
         }
-        .emergency-detail .step-text strong {
+        .detail-card .step-text strong {
             color: var(--danger);
         }
-        .call-ambulance-btn {
+        .call-btn {
             background: var(--danger);
             color: white;
             border: none;
@@ -104,9 +169,16 @@
             justify-content: center;
             gap: 8px;
             width: 100%;
+            transition: background 0.2s;
         }
-        .call-ambulance-btn:active {
+        .call-btn:active {
             background: #c62828;
+        }
+        .empty-message {
+            text-align: center;
+            color: var(--subtext);
+            padding: 30px;
+            font-size: 16px;
         }
     </style>
 </head>
@@ -122,24 +194,47 @@
         </header>
 
         <main class="content">
-            <section id="emergencyListScreen" class="screen active">
-                <div class="category-header">
+            <!-- Экран со списком и категориями -->
+            <section id="listScreen" class="screen active">
+                <div class="category-header" style="padding: 16px 16px 0;">
                     <span class="back-button" onclick="goBackToMain()">← Назад</span>
                     <h2 class="category-title">🚑 Неотложные состояния</h2>
                 </div>
-                <div class="emergency-list" id="emergencyListContainer"></div>
+
+                <!-- Категории -->
+                <div class="category-tabs" id="categoryTabs">
+                    <div class="category-tab active" data-category="all">Все</div>
+                    <div class="category-tab" data-category="heart">❤️ Сердце</div>
+                    <div class="category-tab" data-category="lungs">🫁 Дыхание</div>
+                    <div class="category-tab" data-category="neuro">🧠 Неврология</div>
+                    <div class="category-tab" data-category="endo">🍬 Эндокрин.</div>
+                    <div class="category-tab" data-category="allergy">🤧 Аллергия</div>
+                    <div class="category-tab" data-category="kids">👶 Дети</div>
+                    <div class="category-tab" data-category="trauma">🩹 Травмы</div>
+                    <div class="category-tab" data-category="other">📦 Прочее</div>
+                </div>
+
+                <!-- Поиск -->
+                <div class="emergency-search">
+                    <input type="text" placeholder="🔍 Быстрый поиск состояния..." id="conditionSearch">
+                </div>
+
+                <!-- Список состояний -->
+                <div class="conditions-list" id="conditionsList"></div>
+                <div class="empty-message" id="emptyMessage" style="display: none;">Ничего не найдено</div>
             </section>
 
-            <section id="emergencyDetailScreen" class="screen">
-                <div class="category-header">
-                    <span class="back-button" onclick="showEmergencyList()">← К списку</span>
+            <!-- Экран детальной карточки -->
+            <section id="detailScreen" class="screen detail-screen">
+                <div class="category-header" style="padding: 16px 0 0;">
+                    <span class="back-button" onclick="showList()">← К списку</span>
                     <h2 class="category-title" id="detailTitle">Алгоритм</h2>
                 </div>
-                <div id="emergencyDetailContainer"></div>
+                <div id="detailContainer"></div>
             </section>
         </main>
 
-        <!-- Нижняя панель как на главной, но неактивная (просто заглушка) -->
+        <!-- Нижняя панель (для быстрого возврата на главную) -->
         <nav class="tab-bar">
             <div class="tab-item" onclick="goBackToMain()">🏠</div>
             <div class="tab-item">🔍</div>
@@ -149,172 +244,245 @@
     </div>
 
     <script>
-        // Данные неотложных состояний (можно вынести в отдельный JSON, но пока здесь)
-        const emergencyConditions = [
+        // База данных неотложных состояний (протоколы МЗ РК)
+        const conditions = [
+            // Сердечно-сосудистые
             {
-                name: "СЛР",
+                id: 1,
+                name: "Внезапная остановка сердца (СЛР взрослые)",
                 icon: "🫀",
                 mkb: "I46",
+                category: "heart",
                 steps: [
-                    "Оценить безопасность. Проверить реакцию пациента: громко окликнуть, потрясти за плечо.",
-                    "Вызвать скорую помощь (103). Обеспечить дефибриллятор (АНД).",
-                    "Начать компрессии грудной клетки: 30 надавливаний на глубину 5-6 см, частота 100-120 в мин.",
+                    "Оценить безопасность. Проверить сознание: громко окликнуть, потрясти за плечо.",
+                    "Вызвать скорую (103), попросить принести автоматический дефибриллятор (АНД).",
+                    "Начать компрессии грудной клетки: глубина 5-6 см, частота 100-120 в мин., 30 надавливаний.",
                     "Обеспечить проходимость дыхательных путей (запрокинуть голову, поднять подбородок).",
-                    "Выполнить 2 вдоха (по 1 секунде) с визуальным подъёмом грудной клетки.",
-                    "Продолжать СЛР в соотношении 30:2 до прибытия помощи или восстановления спонтанного дыхания."
+                    "Выполнить 2 вдоха (по 1 сек.) с видимым подъёмом грудной клетки.",
+                    "Продолжать СЛР в соотношении 30:2 до прибытия помощи или появления признаков жизни.",
+                    "При наличии АНД – следовать голосовым командам."
                 ]
             },
             {
-                name: "Анафилактический шок",
-                icon: "🩸",
-                mkb: "T78.0",
-                steps: [
-                    "Прекратить контакт с аллергеном, уложить пациента, ноги приподнять (если нет отёка лёгких).",
-                    "Ввести <strong>Адреналин 0,1% 0,5 мл в/м</strong> в передне‑наружную поверхность бедра (взрослым). Детям 0,01 мг/кг.",
-                    "Обеспечить венозный доступ: NaCl 0,9% болюсно 500–1000 мл (под контролем АД).",
-                    "Антигистаминные: Хлоропирамин (Супрастин) 2% 1 мл в/м.",
-                    "Глюкокортикоиды: Преднизолон 90–120 мг в/в струйно.",
-                    "При бронхоспазме: Сальбутамол через небулайзер 2,5–5 мг.",
-                    "При неэффективности – адреналин в/в титрованно (1 мл 0,1% на 10 мл NaCl 0,9%) под контролем ЭКГ."
-                ]
-            },
-            {
-                name: "Инфаркт миокарда (ОКС с подъёмом ST)",
+                id: 2,
+                name: "Острый коронарный синдром (ОКС) с подъёмом ST",
                 icon: "❤️‍🔥",
                 mkb: "I21",
+                category: "heart",
                 steps: [
-                    "Вызвать скорую, уложить пациента с приподнятым головным концом.",
+                    "Вызвать скорую. Уложить пациента с приподнятым головным концом.",
                     "Аспирин 250 мг разжевать (при отсутствии противопоказаний).",
-                    "Нитроглицерин 0,5 мг сублингвально (при АД сист. > 90 мм рт. ст.), повторять каждые 5 мин до 3 доз.",
+                    "Нитроглицерин 0,5 мг сублингвально, повторять каждые 5 мин. до 3 доз (при АД сист. > 90 мм рт.ст.).",
                     "Оксигенотерапия при SpO₂ < 90%.",
-                    "Обезболивание: Морфин 2-4 мг в/в дробно.",
-                    "Тромболизис (тенектеплаза) по протоколу, если время транспортировки > 30 мин."
+                    "Обезболивание: морфин 2-4 мг в/в дробно.",
+                    "При возможности: тромболизис (тенектеплаза) по протоколу, если время транспортировки > 30 мин."
                 ]
             },
             {
-                name: "Инсульт (подозрение)",
+                id: 3,
+                name: "Гипертонический криз осложненный",
+                icon: "💥",
+                mkb: "I10",
+                category: "heart",
+                steps: [
+                    "Исключить острое поражение органов-мишеней (головной мозг, сердце, почки).",
+                    "Снижать АД не более чем на 25% за первые 2 часа (целевое АД 160-180/100-110 мм рт.ст.).",
+                    "Препараты: урапидил 10-50 мг в/в медленно или нитропруссид натрия 0,25-10 мкг/кг/мин (в/в капельно).",
+                    "При отёке лёгких – дополнительно фуросемид 40-80 мг в/в, нитроглицерин.",
+                    "Госпитализация в отделение интенсивной терапии."
+                ]
+            },
+            {
+                id: 4,
+                name: "Тромбоэмболия легочной артерии (ТЭЛА)",
+                icon: "🩸",
+                mkb: "I26",
+                category: "heart",
+                steps: [
+                    "Оценка дыхания и гемодинамики: при массивной ТЭЛА – гипотония, шок.",
+                    "Кислород: 100% увлажненный, при необходимости В/в доступ, инфузия NaCl 0,9%.",
+                    "При высоком риске (шок, гипотония): нефракционированный гепарин 5000 ЕД в/в болюсно, затем тромболизис (альтеплаза).",
+                    "При среднем риске: низкомолекулярные гепарины (эноксапарин) 1 мг/кг п/к 2 раза/сут.",
+                    "Срочная госпитализация в стационар с возможностью ангиопульмонографии."
+                ]
+            },
+
+            // Дыхательные
+            {
+                id: 5,
+                name: "Отек легких кардиогенный",
+                icon: "🫁",
+                mkb: "J81",
+                category: "lungs",
+                steps: [
+                    "Посадить пациента с опущенными ногами, обеспечить доступ свежего воздуха.",
+                    "Кислород: 100% увлажненный, при неэффективности – неинвазивная вентиляция (CPAP).",
+                    "Нитроглицерин 0,5 мг сублингвально каждые 5 мин. (до 3 доз) при АД > 90 мм рт.ст.",
+                    "Фуросемид 40-80 мг в/в струйно.",
+                    "Морфин 2-4 мг в/в (при выраженном беспокойстве, боли).",
+                    "При гипотонии – инотропная поддержка (добутамин)."
+                ]
+            },
+            {
+                id: 6,
+                name: "Острая дыхательная недостаточность",
+                icon: "😮‍💨",
+                mkb: "J96.0",
+                category: "lungs",
+                steps: [
+                    "Оценить проходимость дыхательных путей (инородное тело, западение языка).",
+                    "Кислород через маску/носовые канюли для достижения SpO₂ > 90%.",
+                    "При брадипноэ, угнетении сознания – вспомогательная вентиляция мешком Амбу.",
+                    "Пульсоксиметрия, контроль ЧДД, ЭКГ.",
+                    "Вызвать скорую, госпитализация в зависимости от причины."
+                ]
+            },
+
+            // Неврологические
+            {
+                id: 7,
+                name: "Острое нарушение мозгового кровообращения (инсульт)",
                 icon: "🧠",
                 mkb: "I64",
+                category: "neuro",
                 steps: [
                     "Оценить по шкале FAST (лицо, рука, речь).",
-                    "Обеспечить проходимость дыхательных путей, ингаляция кислорода при SpO₂ < 94%.",
-                    "Контроль АД: не снижать резко! Если АД > 220/120 – осторожно снижать не более чем на 15% в первые часы.",
+                    "Проходимость дыхательных путей, кислород при SpO₂ < 94%.",
+                    "Контроль АД: не снижать резко! При АД > 220/120 – снижать не более чем на 15% за первые часы.",
                     "Глюкоза крови: гипогликемию (< 3,3 ммоль/л) купировать 40% глюкозой в/в.",
-                    "Срочная госпитализация в специализированный инсультный центр.",
+                    "Срочная госпитализация в специализированный сосудистый центр.",
                     "Не давать аспирин до исключения геморрагического инсульта (КТ)."
                 ]
             },
             {
-                name: "Отек легких",
-                icon: "🫁",
-                mkb: "J81",
+                id: 8,
+                name: "Судорожный синдром (эпилептический статус)",
+                icon: "⚡",
+                mkb: "G41",
+                category: "neuro",
                 steps: [
-                    "Посадить пациента с опущенными ногами, обеспечить доступ воздуха.",
-                    "Оксигенотерапия: 100% увлажнённый кислород.",
-                    "Нитроглицерин 0,5 мг сублингвально (при систолическом АД > 90 мм рт. ст.), повторять каждые 5 мин.",
-                    "Фуросемид 40-80 мг в/в струйно.",
-                    "Морфин 2-4 мг в/в (при выраженном беспокойстве и боли).",
-                    "При неэффективности – инотропная поддержка (добутамин) и неинвазивная вентиляция лёгких."
+                    "Обеспечить безопасность: повернуть на бок, защитить голову.",
+                    "Диазепам 0,15-0,2 мг/кг в/в (макс. 10 мг) медленно. При неэффективности повторить через 5-10 мин.",
+                    "При продолжающихся судорогах > 30 мин – леветирацетам 20 мг/кг в/в или вальпроевая кислота 25 мг/кг.",
+                    "Контроль дыхания, кислород.",
+                    "Госпитализация в ОРИТ."
                 ]
             },
             {
+                id: 9,
+                name: "Кома неясной этиологии",
+                icon: "💤",
+                mkb: "R40.2",
+                category: "neuro",
+                steps: [
+                    "Оценка уровня сознания по шкале Глазго.",
+                    "Обеспечение проходимости дыхательных путей, интубация при угнетении дыхания.",
+                    "Определить глюкозу крови немедленно! Гипогликемию купировать 40% глюкозой 20-40 мл в/в.",
+                    "Налоксон 0,4-2 мг в/в (при подозрении на передозировку опиоидов).",
+                    "Тиамин 100 мг в/в перед глюкозой (профилактика энцефалопатии Вернике).",
+                    "Госпитализация в стационар."
+                ]
+            },
+
+            // Эндокринные
+            {
+                id: 10,
                 name: "Гипогликемия",
                 icon: "🍬",
                 mkb: "E16.2",
+                category: "endo",
                 steps: [
-                    "Если пациент в сознании: дать 15-20 г быстрых углеводов (сладкий чай, сахар, глюкоза в таблетках).",
+                    "При сознании: дать 15-20 г быстрых углеводов внутрь (сахар, сладкий чай, глюкоза в таблетках).",
                     "При нарушении сознания: 40% раствор глюкозы 20-40 мл в/в струйно.",
                     "При невозможности в/в доступа: глюкагон 1 мг в/м или п/к.",
-                    "Контроль уровня глюкозы через 10-15 мин, при необходимости повторить."
+                    "Контроль глюкозы через 10-15 мин, при необходимости повторить."
                 ]
             },
             {
-                name: "Гипертонический криз",
-                icon: "💥",
-                mkb: "I10",
+                id: 11,
+                name: "Диабетический кетоацидоз (ДКА)",
+                icon: "💉",
+                mkb: "E10.1",
+                category: "endo",
                 steps: [
-                    "Исключить острое поражение органов-мишеней (головной мозг, сердце, почки).",
-                    "При неосложнённом кризе: пероральная терапия (каптоприл 25 мг под язык).",
-                    "При осложнённом: в/в введение гипотензивных (урапидил, нитропруссид натрия) под контролем АД.",
-                    "Снижать АД не более чем на 25% за первые 2 часа.",
-                    "Госпитализация при осложнённом кризе."
+                    "Инфузия 0,9% NaCl: 1000 мл в первый час, затем 500 мл/ч (под контролем диуреза).",
+                    "Инсулинотерапия: инсулин короткого действия 0,1 ЕД/кг/ч в/в (после регидратации).",
+                    "Контроль калия: при K⁺ < 5,5 ммоль/л – добавить KCl 20 ммоль/л в инфузию.",
+                    "Мониторинг глюкозы, электролитов, кетонов каждые 2-3 часа.",
+                    "Госпитализация в эндокринологическое отделение."
                 ]
             },
+
+            // Аллергия
             {
-                name: "Отек Квинке",
+                id: 12,
+                name: "Анафилактический шок",
                 icon: "🤧",
-                mkb: "T78.3",
+                mkb: "T78.0",
+                category: "allergy",
                 steps: [
-                    "Оценить дыхание: при отёке гортани – срочная интубация/коникотомия.",
-                    "Адреналин 0,1% 0,3-0,5 мл в/м (может потребоваться повторение через 15 мин).",
-                    "Антигистаминные: Хлоропирамин 2% 1 мл в/м.",
-                    "Глюкокортикоиды: Преднизолон 60-90 мг в/м или в/в.",
+                    "Прекратить контакт с аллергеном, уложить пациента, ноги приподнять (если нет отёка лёгких).",
+                    "Адреналин 0,1% 0,5 мл в/м в среднюю треть бедра (взрослым). Детям 0,01 мг/кг, макс. 0,3 мг.",
+                    "Венозный доступ: NaCl 0,9% 500-1000 мл болюсно.",
+                    "Хлоропирамин (Супрастин) 2% 1 мл в/м.",
+                    "Преднизолон 90-120 мг в/в.",
+                    "При бронхоспазме – сальбутамол через небулайзер.",
+                    "При неэффективности – адреналин в/в титрованно (1 мл 0,1% на 10 мл NaCl 0,9%)."
+                ]
+            },
+            {
+                id: 13,
+                name: "Отек Квинке",
+                icon: "😤",
+                mkb: "T78.3",
+                category: "allergy",
+                steps: [
+                    "При отёке гортани – немедленная интубация или коникотомия.",
+                    "Адреналин 0,1% 0,3-0,5 мл в/м (можно повторить через 15 мин).",
+                    "Хлоропирамин 2% 1 мл в/м.",
+                    "Преднизолон 60-90 мг в/м или в/в.",
                     "Ингаляция кислорода."
                 ]
-            }
-        ];
+            },
 
-        // Рендер списка неотложных состояний
-        function renderEmergencyList() {
-            const container = document.getElementById('emergencyListContainer');
-            container.innerHTML = '';
-            emergencyConditions.forEach((condition, index) => {
-                const item = document.createElement('div');
-                item.className = 'emergency-list-item';
-                item.innerHTML = `<span class="emoji">${condition.icon}</span> ${condition.name}`;
-                item.onclick = () => showEmergencyDetail(index);
-                container.appendChild(item);
-            });
-        }
-
-        // Показать детальный алгоритм
-        function showEmergencyDetail(index) {
-            const condition = emergencyConditions[index];
-            document.getElementById('emergencyListScreen').classList.remove('active');
-            document.getElementById('emergencyDetailScreen').classList.add('active');
-            document.getElementById('detailTitle').textContent = condition.name;
-
-            const detailContainer = document.getElementById('emergencyDetailContainer');
-            let stepsHtml = '';
-            condition.steps.forEach((step, i) => {
-                stepsHtml += `
-                    <div class="step">
-                        <div class="step-num">${i + 1}</div>
-                        <div class="step-text">${step}</div>
-                    </div>
-                `;
-            });
-
-            detailContainer.innerHTML = `
-                <div class="emergency-detail">
-                    <h2>${condition.icon} ${condition.name}</h2>
-                    <div class="mkb">Код МКБ-10: ${condition.mkb}</div>
-                    ${stepsHtml}
-                    <button class="call-ambulance-btn" onclick="callAmbulance()">📞 Вызвать скорую (103)</button>
-                </div>
-            `;
-        }
-
-        // Вернуться к списку состояний
-        function showEmergencyList() {
-            document.getElementById('emergencyDetailScreen').classList.remove('active');
-            document.getElementById('emergencyListScreen').classList.add('active');
-        }
-
-        // Назад на главную
-        function goBackToMain() {
-            window.location.href = 'index.html';
-        }
-
-        // Вызов скорой (заглушка)
-        function callAmbulance() {
-            alert('Вызов 103... (имитация)');
-        }
-
-        // Инициализация
-        document.addEventListener('DOMContentLoaded', () => {
-            renderEmergencyList();
-        });
-    </script>
-</body>
-</html>
+            // Дети
+            {
+                id: 14,
+                name: "СЛР у детей",
+                icon: "👶🫀",
+                mkb: "I46",
+                category: "kids",
+                steps: [
+                    "Проверить безопасность, реакцию ребенка (оклик, похлопывание).",
+                    "Вызвать скорую (103), после 1 минуты СЛР, если вы один.",
+                    "Компрессии грудной клетки: глубина не менее 1/3 диаметра (около 4 см у грудничков, 5 см у старших), частота 100-120/мин.",
+                    "Соотношение компрессий и вдохов 30:2 (если один спасатель) или 15:2 (если два).",
+                    "При использовании АНД – детские электроды или уменьшенная мощность.",
+                    "Продолжать до прибытия помощи."
+                ]
+            },
+            {
+                id: 15,
+                name: "Фебрильные судороги у детей",
+                icon: "🌡️👶",
+                mkb: "R56.0",
+                category: "kids",
+                steps: [
+                    "Уложить ребенка на бок, обеспечить безопасность.",
+                    "Диазепам ректально 0,5 мг/кг (макс. 10 мг) или мидазолам буккально 0,2 мг/кг.",
+                    "Жаропонижающие: парацетамол 15 мг/кг или ибупрофен 10 мг/кг.",
+                    "При длительности судорог > 5 мин – госпитализация.",
+                    "Не пытаться разжать челюсти, не вставлять предметы в рот."
+                ]
+            },
+            {
+                id: 16,
+                name: "Острый стенозирующий ларинготрахеит (ложный круп)",
+                icon: "🗣️",
+                mkb: "J05.0",
+                category: "kids",
+                steps: [
+                    "Успокоить ребенка, обеспечить приток свежего прохладного воздуха.",
+                    "Ингаляции суспензии будесонида 0,25-0,5 мг через небулайзер или дексаметазон 0,6 мг/кг в/м.",
+                    "При тяжёлом стенозе – адреналин 0,1% 0,5 мл/кг через небулайзер.",
+                    "Госпитализация при неэффективности или признаках дыхательн
