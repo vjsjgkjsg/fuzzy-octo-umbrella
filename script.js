@@ -1,4 +1,4 @@
-// Данные категорий
+// Данные категорий для главного экрана
 const categories = [
     { icon: "🩺", title: "Первая помощь", desc: "Базовые алгоритмы, остановка кровотечений", tags: ["первая", "помощь", "кровотечение"] },
     { icon: "🚑", title: "Неотложные состояния", desc: "Расширенные алгоритмы, шкалы", tags: ["неотложка", "шкала", "алгоритм"] },
@@ -37,7 +37,7 @@ const emergencyStates = [
 
 let emergencyMode = false;
 
-// Рендер категорий
+// Рендер категорий на главном экране
 function renderCategories(filterText = "") {
     const grid = document.getElementById('categoryGrid');
     if (!grid) return;
@@ -57,7 +57,7 @@ function renderCategories(filterText = "") {
     });
 }
 
-// Рендер экстренных состояний
+// Рендер модального окна экстренной помощи
 function renderEmergency() {
     const grid = document.getElementById('emergencyGrid');
     if (!grid) return;
@@ -74,7 +74,7 @@ function renderEmergency() {
     });
 }
 
-// Фильтрация карточек при вводе в поиск
+// Фильтрация карточек при поиске
 function filterCards() {
     const input = document.getElementById('mainSearch');
     if (input) renderCategories(input.value);
@@ -87,7 +87,7 @@ function toggleTheme() {
     if (btn) btn.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
 }
 
-// Переключение режима скорой
+// Режим скорой
 function toggleEmergencyMode() {
     emergencyMode = !emergencyMode;
     const btn = document.getElementById('emergencyModeBtn');
@@ -123,8 +123,19 @@ function switchTab(tab) {
     });
 }
 
-// Открыть экран категории
+// Открытие категории: для "Неотложные состояния" – переход на отдельную страницу,
+// для остальных – пока заглушка внутри приложения
 function openCategory(title, tags) {
+    if (title === "Неотложные состояния") {
+        window.location.href = "emergency.html";
+        return;
+    }
+    if (title === "Избранное") {
+        switchTab('favorites');
+        return;
+    }
+
+    // Для остальных разделов временно показываем внутренний экран
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     const categoryScreen = document.getElementById('categoryScreen');
     const titleEl = document.getElementById('categoryTitle');
@@ -132,23 +143,20 @@ function openCategory(title, tags) {
     
     if (titleEl) titleEl.textContent = title;
     if (contentEl) {
-        // Заглушка контента, в будущем здесь будет подгружаться нужный раздел
         contentEl.innerHTML = `<div class="placeholder">Раздел «${title}» в разработке</div>`;
     }
     if (categoryScreen) categoryScreen.classList.add('active');
     
-    // Убираем активность с таб-бара
     document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
 }
 
-// Закрыть категорию и вернуться на главный экран
+// Закрытие категории (кнопка "Назад") – возврат на главную
 function closeCategory() {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById('homeScreen').classList.add('active');
     document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
     const homeTab = document.querySelector('.tab-item[data-tab="home"]');
     if (homeTab) homeTab.classList.add('active');
-    // Очищаем поиск и перерисовываем категории полностью
     const searchInput = document.getElementById('mainSearch');
     if (searchInput) searchInput.value = '';
     renderCategories();
@@ -228,7 +236,18 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Кнопка "Назад" из раздела
+    // Быстрые действия (горизонтальный скролл)
+    document.querySelectorAll('.quick-action').forEach(action => {
+        action.addEventListener('click', () => {
+            const category = action.dataset.category;
+            if (category) {
+                // Используем openCategory, которая уже содержит нужную логику
+                openCategory(category, []);
+            }
+        });
+    });
+
+    // Кнопка "Назад" из раздела (внутренний экран)
     const backBtn = document.getElementById('backFromCategory');
     if (backBtn) backBtn.addEventListener('click', closeCategory);
 
