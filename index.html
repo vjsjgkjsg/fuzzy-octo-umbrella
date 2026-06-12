@@ -8,7 +8,6 @@
 </head>
 <body>
     <div id="app">
-        <!-- Шапка -->
         <header class="header">
             <div class="logo">MedPocket KZ</div>
             <div class="header-icons">
@@ -18,7 +17,6 @@
             </div>
         </header>
 
-        <!-- Контент -->
         <main class="content">
             <!-- Главный экран -->
             <section id="homeScreen" class="screen active">
@@ -33,11 +31,11 @@
                 </div>
 
                 <div class="quick-actions" id="quickActions">
-                    <div class="quick-action">🚑 Неотложные</div>
-                    <div class="quick-action">💊 Препараты</div>
-                    <div class="quick-action">📋 Протоколы</div>
-                    <div class="quick-action">📊 Калькуляторы</div>
-                    <div class="quick-action">⭐ Избранное</div>
+                    <div class="quick-action" data-category="Неотложные состояния">🚑 Неотложные</div>
+                    <div class="quick-action" data-category="Лекарственный справочник">💊 Препараты</div>
+                    <div class="quick-action" data-category="Клинические протоколы РК">📋 Протоколы</div>
+                    <div class="quick-action" data-category="Медицинские калькуляторы">📊 Калькуляторы</div>
+                    <div class="quick-action" data-category="Избранное">⭐ Избранное</div>
                     <div class="quick-action" id="emergencyModeBtn">⚡ Режим скорой</div>
                 </div>
 
@@ -45,7 +43,6 @@
                 <div class="footer-note">База обновлена: июнь 2026 • МЗ РК</div>
             </section>
 
-            <!-- Экран поиска -->
             <section id="searchScreen" class="screen">
                 <div class="search-container">
                     <input type="text" placeholder="Поиск по всему справочнику..." id="searchInput">
@@ -54,29 +51,23 @@
                 <div class="placeholder">Начните вводить запрос — результаты появятся здесь</div>
             </section>
 
-            <!-- Избранное -->
             <section id="favoritesScreen" class="screen">
                 <div class="placeholder">⭐ Здесь будут ваши избранные алгоритмы и препараты</div>
             </section>
 
-            <!-- Профиль -->
             <section id="profileScreen" class="screen">
                 <div class="placeholder">👤 Профиль и настройки специализации</div>
             </section>
 
-            <!-- Экран раздела (динамический) -->
             <section id="categoryScreen" class="screen">
                 <div class="category-header">
                     <span class="back-button" id="backFromCategory">← Назад</span>
                     <h2 class="category-title" id="categoryTitle">Раздел</h2>
                 </div>
-                <div class="category-content" id="categoryContent">
-                    <div class="placeholder">Раздел в разработке</div>
-                </div>
+                <div class="category-content" id="categoryContent"></div>
             </section>
         </main>
 
-        <!-- Нижняя панель -->
         <nav class="tab-bar">
             <div class="tab-item active" data-tab="home">🏠</div>
             <div class="tab-item" data-tab="search">🔍</div>
@@ -84,7 +75,6 @@
             <div class="tab-item" data-tab="profile">👤</div>
         </nav>
 
-        <!-- Модальное окно экстренных состояний -->
         <div id="emergencyModal" class="modal-overlay">
             <div class="modal-content">
                 <div class="modal-header">
@@ -96,7 +86,6 @@
             </div>
         </div>
 
-        <!-- Заглушка микрофона -->
         <div class="mic-overlay" id="micOverlay">
             <span style="font-size:48px;">🎤</span>
             <span>Скажите запрос...</span>
@@ -105,4 +94,4 @@
 
     <script src="script.js"></script>
 </body>
-                    </html>
+</html>
