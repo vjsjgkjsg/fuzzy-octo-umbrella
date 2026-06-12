@@ -485,4 +485,171 @@
                     "Успокоить ребенка, обеспечить приток свежего прохладного воздуха.",
                     "Ингаляции суспензии будесонида 0,25-0,5 мг через небулайзер или дексаметазон 0,6 мг/кг в/м.",
                     "При тяжёлом стенозе – адреналин 0,1% 0,5 мл/кг через небулайзер.",
-                    "Госпитализация при неэффективности или признаках дыхательн
+                    "Госпитализация при неэффективности или признаках дыхательной недостаточности."
+                ]
+            },
+
+            // Травмы
+            {
+                id: 17,
+                name: "Черепно-мозговая травма",
+                icon: "🤕",
+                mkb: "S06",
+                category: "trauma",
+                steps: [
+                    "Оценка по шкале Глазго, обеспечение шейного отдела (воротник).",
+                    "Стабилизация гемодинамики, избегать гипотонии (АД ср. > 90 мм рт.ст.).",
+                    "При угнетении дыхания – интубация, гипервентиляция (рСО₂ 35-40 мм рт.ст.).",
+                    "Головной конец приподнять на 30° (при отсутствии шока).",
+                    "Срочная госпитализация в нейрохирургический стационар."
+                ]
+            },
+            {
+                id: 18,
+                name: "Массивное наружное кровотечение",
+                icon: "🩸",
+                mkb: "T14.1",
+                category: "trauma",
+                steps: [
+                    "Прямое давление на рану стерильной тканью/жгутом (жгут на конечность при артериальном кровотечении).",
+                    "Жгут выше раны, время наложения записать.",
+                    "Признаки шока: уложить, ноги приподнять, укутать.",
+                    "Венозный доступ, инфузия NaCl 0,9% 500-1000 мл (осторожно при подозрении на внутреннее кровотечение).",
+                    "Срочная госпитализация."
+                ]
+            },
+
+            // Прочие
+            {
+                id: 19,
+                name: "Острые отравления (общие принципы)",
+                icon: "☠️",
+                mkb: "T65",
+                category: "other",
+                steps: [
+                    "Оценить жизненные функции, удалить пострадавшего из зоны воздействия.",
+                    "При пероральном отравлении: промывание желудка (если нет противопоказаний, в первые 1-2 часа).",
+                    "Активированный уголь 1 г/кг внутрь.",
+                    "Специфические антидоты (налоксон, атропин, тиамин) по показаниям.",
+                    "Срочная госпитализация в токсикологическое отделение."
+                ]
+            },
+            {
+                id: 20,
+                name: "Роды вне стационара",
+                icon: "🤱",
+                mkb: "Z39.0",
+                category: "other",
+                steps: [
+                    "Успокоить женщину, уложить на спину с согнутыми коленями.",
+                    "Принять ребенка, обеспечив чистоту (чистые простыни, полотенца).",
+                    "Пережать пуповину двумя зажимами (на расстоянии 10 и 15 см от ребенка), пересечь между ними стерильным инструментом.",
+                    "Оценить состояние новорожденного (шкала Апгар), при необходимости – СЛР новорожденного (3:1).",
+                    "Обеспечить тепло, матери – окситоцин 10 ЕД в/м после рождения плаценты.",
+                    "Вызвать скорую для транспортировки в родильное отделение."
+                ]
+            }
+        ];
+
+        // Отображение списка с учетом фильтров
+        function renderList(category = 'all', search = '') {
+            const list = document.getElementById('conditionsList');
+            const empty = document.getElementById('emptyMessage');
+            list.innerHTML = '';
+            let filtered = conditions;
+
+            if (category !== 'all') {
+                filtered = filtered.filter(c => c.category === category);
+            }
+            if (search) {
+                const s = search.toLowerCase();
+                filtered = filtered.filter(c => c.name.toLowerCase().includes(s) || c.mkb.toLowerCase().includes(s));
+            }
+
+            if (filtered.length === 0) {
+                empty.style.display = 'block';
+                return;
+            } else {
+                empty.style.display = 'none';
+            }
+
+            filtered.forEach(cond => {
+                const item = document.createElement('div');
+                item.className = 'condition-item';
+                item.innerHTML = `
+                    <div class="cond-icon">${cond.icon}</div>
+                    <div class="cond-info">
+                        <div class="cond-name">${cond.name}</div>
+                        <div class="cond-mkb">МКБ-10: ${cond.mkb}</div>
+                    </div>
+                    <div class="cond-arrow">›</div>
+                `;
+                item.onclick = () => showDetail(cond.id);
+                list.appendChild(item);
+            });
+        }
+
+        // Показать детальный алгоритм
+        function showDetail(id) {
+            const cond = conditions.find(c => c.id === id);
+            if (!cond) return;
+            document.getElementById('listScreen').classList.remove('active');
+            document.getElementById('detailScreen').classList.add('active');
+            document.getElementById('detailTitle').textContent = cond.name;
+
+            let stepsHtml = cond.steps.map((step, i) => `
+                <div class="step">
+                    <div class="step-num">${i + 1}</div>
+                    <div class="step-text">${step}</div>
+                </div>
+            `).join('');
+
+            document.getElementById('detailContainer').innerHTML = `
+                <div class="detail-card">
+                    <h2>${cond.icon} ${cond.name}</h2>
+                    <div class="mkb">Код МКБ-10: ${cond.mkb}</div>
+                    ${stepsHtml}
+                    <button class="call-btn" onclick="callAmbulance()">📞 Вызвать скорую (103)</button>
+                </div>
+            `;
+        }
+
+        // Вернуться к списку
+        function showList() {
+            document.getElementById('detailScreen').classList.remove('active');
+            document.getElementById('listScreen').classList.add('active');
+        }
+
+        function goBackToMain() {
+            window.location.href = 'index.html';
+        }
+
+        function callAmbulance() {
+            alert('Вызов 103... (имитация)');
+        }
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', () => {
+            // Категории
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    const category = tab.dataset.category;
+                    const search = document.getElementById('conditionSearch').value;
+                    renderList(category, search);
+                });
+            });
+
+            // Поиск
+            document.getElementById('conditionSearch').addEventListener('input', (e) => {
+                const activeCat = document.querySelector('.category-tab.active')?.dataset.category || 'all';
+                renderList(activeCat, e.target.value);
+            });
+
+            // Первый рендер
+            renderList();
+        });
+    </script>
+</body>
+</html>
