@@ -10,147 +10,176 @@
             --calc-primary: #1565C0;
             --calc-light: #E3F2FD;
             --calc-border: #90CAF9;
+            --calc-shadow: 0 8px 20px rgba(0,0,0,0.05);
         }
         body.dark {
             --calc-primary: #42A5F5;
             --calc-light: #0D47A1;
             --calc-border: #1976D2;
+            --calc-shadow: 0 8px 20px rgba(0,0,0,0.4);
         }
-        .calc-container {
-            padding: 0 0 20px;
-        }
+        .calc-container { padding: 0 0 30px; }
+        /* Категории */
         .category-tabs {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
-            margin-bottom: 16px;
-            padding: 0 16px;
+            margin: 0 16px 20px;
         }
         .category-tab {
             background: var(--card-bg);
             border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 6px 14px;
-            font-size: 13px;
+            border-radius: 30px;
+            padding: 8px 18px;
+            font-size: 14px;
             font-weight: 600;
             color: var(--text);
             cursor: pointer;
-            white-space: nowrap;
+            transition: 0.2s;
         }
         .category-tab.active {
             background: var(--calc-primary);
-            color: white;
+            color: #fff;
             border-color: var(--calc-primary);
+            box-shadow: 0 4px 12px rgba(21,101,192,0.3);
         }
+        /* Поиск */
         .calc-search {
-            background: var(--card-bg);
-            border-radius: 14px;
-            padding: 8px 14px;
-            display: flex;
-            align-items: center;
-            margin: 0 16px 16px;
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow);
-        }
-        .calc-search input {
-            border: none;
-            background: transparent;
-            font-size: 16px;
-            padding: 8px 0;
-            outline: none;
-            flex: 1;
-            color: var(--text);
-        }
-        .calc-search input::placeholder { color: var(--subtext); }
-        .calc-list {
-            padding: 0 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .calc-item {
-            background: var(--card-bg);
-            border-radius: 14px;
-            padding: 14px 16px;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            cursor: pointer;
-            border: 1px solid var(--border);
-            transition: transform 0.1s;
-        }
-        .calc-item:active { transform: scale(0.98); }
-        .calc-icon { font-size: 28px; width: 40px; text-align: center; }
-        .calc-info { flex: 1; }
-        .calc-name { font-weight: 700; font-size: 16px; color: var(--text); }
-        .calc-desc { font-size: 12px; color: var(--subtext); }
-        .calc-arrow { color: var(--subtext); font-size: 18px; }
-
-        .detail-screen { padding: 0 16px 20px; }
-        .calculator-card {
+            margin: 0 16px 20px;
             background: var(--card-bg);
             border-radius: 20px;
-            padding: 20px;
+            padding: 6px 18px;
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--border);
+            box-shadow: var(--calc-shadow);
+        }
+        .calc-search input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-size: 17px;
+            padding: 12px 0;
+            outline: none;
+            color: var(--text);
+        }
+        /* Сетка калькуляторов */
+        .calc-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            padding: 0 16px;
+        }
+        .calc-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 16px;
+            width: calc(50% - 7px);
+            box-shadow: var(--calc-shadow);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .calc-card:active { transform: scale(0.96); }
+        .calc-card .calc-icon {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+        .calc-card .calc-name {
+            font-weight: 700;
+            font-size: 15px;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+        .calc-card .calc-desc {
+            font-size: 12px;
+            color: var(--subtext);
+        }
+
+        /* Детальный вид */
+        .detail-screen { padding: 0 16px 30px; }
+        .calc-panel {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: var(--calc-shadow);
             border: 2px solid var(--calc-primary);
             margin-bottom: 20px;
         }
-        .calculator-card h2 {
+        .calc-panel h2 {
             color: var(--calc-primary);
-            font-size: 22px;
+            font-size: 24px;
             font-weight: 800;
             margin-bottom: 6px;
             display: flex;
             align-items: center;
             gap: 10px;
         }
-        .calculator-card .desc-text {
-            color: var(--subtext);
-            font-size: 14px;
-            margin-bottom: 16px;
+        .calc-panel .desc-text { color: var(--subtext); font-size: 15px; margin-bottom: 20px; }
+        .input-field {
+            margin-bottom: 18px;
         }
-        .input-group {
-            margin-bottom: 14px;
-        }
-        .input-group label {
+        .input-field label {
             display: block;
-            font-weight: 600;
-            margin-bottom: 6px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            font-size: 15px;
             color: var(--text);
-            font-size: 14px;
         }
-        .input-group input, .input-group select {
+        .input-field input, .input-field select {
             width: 100%;
-            padding: 10px 14px;
-            border-radius: 12px;
+            padding: 14px 16px;
+            border-radius: 16px;
             border: 1px solid var(--border);
-            font-size: 16px;
+            font-size: 17px;
             background: var(--bg);
             color: var(--text);
+            appearance: none;
+            -webkit-appearance: none;
         }
-        .result-box {
+        .input-field select {
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 20px;
+        }
+        .result-panel {
             background: var(--calc-light);
-            border-radius: 14px;
-            padding: 14px;
-            margin-top: 20px;
-            font-weight: 700;
-            font-size: 18px;
-            color: var(--calc-primary);
+            border-radius: 18px;
+            padding: 18px;
+            margin-top: 24px;
             text-align: center;
         }
-        .btn-calc {
+        .result-panel .result-value {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--calc-primary);
+        }
+        .result-panel .result-text {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text);
+            margin-top: 6px;
+        }
+        .btn-primary {
             background: var(--calc-primary);
             color: white;
             border: none;
-            border-radius: 14px;
-            padding: 14px;
+            border-radius: 16px;
+            padding: 16px;
             font-weight: 700;
-            font-size: 16px;
-            margin-top: 20px;
+            font-size: 17px;
+            margin-top: 16px;
             cursor: pointer;
             width: 100%;
+            transition: opacity 0.2s;
         }
-        .btn-calc:active { opacity: 0.9; }
-        .empty-message { text-align: center; color: var(--subtext); padding: 30px; }
+        .btn-primary:active { opacity: 0.8; }
+        .empty-message { text-align: center; color: var(--subtext); padding: 30px; font-size: 16px; }
     </style>
 </head>
 <body>
@@ -159,36 +188,29 @@
         <div class="logo">MedPocket KZ</div>
         <div class="header-icons">
             <span>🔔</span>
-            <button class="theme-toggle" id="themeToggle">🌙</button>
+            <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
             <span>⚙️</span>
         </div>
     </header>
 
     <main class="content">
         <section id="listScreen" class="screen active">
-            <div class="category-header" style="padding:16px 16px 0;">
+            <div class="category-header" style="padding:16px;">
                 <span class="back-button" onclick="goBackToMain()">← Назад</span>
                 <h2 class="category-title">📊 Медицинские калькуляторы</h2>
             </div>
-            <div class="category-tabs" id="categoryTabs">
-                <div class="category-tab active" data-category="all">Все</div>
-                <div class="category-tab" data-category="scales">⚖️ Шкалы</div>
-                <div class="category-tab" data-category="dose">💊 Дозировки</div>
-                <div class="category-tab" data-category="infusion">💧 Инфузии</div>
-                <div class="category-tab" data-category="convert">🔄 Конвертеры</div>
-                <div class="category-tab" data-category="other">📦 Прочее</div>
-            </div>
+            <div class="category-tabs" id="categoryTabs"></div>
             <div class="calc-search">
                 <input type="text" placeholder="🔍 Найти калькулятор..." id="calcSearch">
             </div>
-            <div class="calc-list" id="calcList"></div>
+            <div class="calc-grid" id="calcGrid"></div>
             <div class="empty-message" id="emptyMsg" style="display:none;">Ничего не найдено</div>
         </section>
 
         <section id="detailScreen" class="screen detail-screen">
-            <div class="category-header" style="padding:16px 0 0;">
+            <div class="category-header" style="padding:16px 0;">
                 <span class="back-button" onclick="showList()">← К списку</span>
-                <h2 class="category-title" id="detailTitle">Калькулятор</h2>
+                <h2 class="category-title" id="detailTitle"></h2>
             </div>
             <div id="detailContainer"></div>
         </section>
@@ -204,47 +226,75 @@
 
 <script>
     const calculators = [
-        { id:1, name:"Шкала комы Глазго (GCS)", icon:"🧠", category:"scales", desc:"Оценка уровня сознания", type:"gcs" },
-        { id:2, name:"qSOFA (Quick SOFA)", icon:"🫁", category:"scales", desc:"Скрининг сепсиса", type:"qsofa" },
-        { id:3, name:"HAS-BLED", icon:"🩸", category:"scales", desc:"Риск кровотечений при антикоагуляции", type:"hasbled" },
-        { id:4, name:"ИМТ (индекс массы тела)", icon:"⚖️", category:"other", desc:"Масса/рост", type:"bmi" },
-        { id:5, name:"Расчёт инфузии", icon:"💧", category:"infusion", desc:"Скорость капельницы", type:"infusion" },
-        { id:6, name:"Дозировка по весу", icon:"💊", category:"dose", desc:"Расчёт дозы препарата в мг/кг", type:"weightdose" },
-        { id:7, name:"Конвертер глюкозы", icon:"🍬", category:"convert", desc:"ммоль/л ↔ мг/дл", type:"glucose" },
-        { id:8, name:"Конвертер креатинина", icon:"🧪", category:"convert", desc:"мг/дл ↔ мкмоль/л", type:"creatinine" },
-        { id:9, name:"Оценка кровопотери", icon:"🩸", category:"other", desc:"По шоковому индексу Альговера", type:"bloodloss" },
-        { id:10, name:"Шкала анафилаксии Ring & Messmer", icon:"🤧", category:"scales", desc:"Тяжесть анафилаксии", type:"anaphylaxis" }
+        { id:1, name:"Шкала комы Глазго", icon:"🧠", cat:"scales", desc:"Оценка сознания", type:"gcs" },
+        { id:2, name:"qSOFA", icon:"🫁", cat:"scales", desc:"Скрининг сепсиса", type:"qsofa" },
+        { id:3, name:"HAS-BLED", icon:"🩸", cat:"scales", desc:"Риск кровотечений", type:"hasbled" },
+        { id:4, name:"ИМТ", icon:"⚖️", cat:"other", desc:"Индекс массы тела", type:"bmi" },
+        { id:5, name:"Инфузия", icon:"💧", cat:"infusion", desc:"Скорость капельницы", type:"infusion" },
+        { id:6, name:"Доза по весу", icon:"💊", cat:"dose", desc:"Расчёт мг/кг", type:"weightdose" },
+        { id:7, name:"Глюкоза", icon:"🍬", cat:"convert", desc:"ммоль/л ↔ мг/дл", type:"glucose" },
+        { id:8, name:"Креатинин", icon:"🧪", cat:"convert", desc:"мг/дл ↔ мкмоль/л", type:"creatinine" },
+        { id:9, name:"Кровопотеря", icon:"🩸", cat:"other", desc:"Шоковый индекс", type:"bloodloss" },
+        { id:10, name:"Анафилаксия", icon:"🤧", cat:"scales", desc:"Степень тяжести", type:"anaphylaxis" }
     ];
 
-    function renderList(cat='all', search='') {
-        const list = document.getElementById('calcList');
-        const empty = document.getElementById('emptyMsg');
-        list.innerHTML = '';
-        let filtered = calculators;
-        if (cat!=='all') filtered = filtered.filter(c=>c.category===cat);
-        if (search) {
-            const s = search.toLowerCase();
-            filtered = filtered.filter(c=>c.name.toLowerCase().includes(s)||c.desc.toLowerCase().includes(s));
-        }
-        if (filtered.length===0) { empty.style.display='block'; return; }
-        else empty.style.display='none';
-        filtered.forEach(c=>{
-            const div = document.createElement('div');
-            div.className = 'calc-item';
-            div.innerHTML = `<div class="calc-icon">${c.icon}</div><div class="calc-info"><div class="calc-name">${c.name}</div><div class="calc-desc">${c.desc}</div></div><div class="calc-arrow">›</div>`;
-            div.onclick = ()=>showDetail(c.id);
-            list.appendChild(div);
+    const categories = [
+        { key: "all", name: "Все" },
+        { key: "scales", name: "⚖️ Шкалы" },
+        { key: "dose", name: "💊 Дозировки" },
+        { key: "infusion", name: "💧 Инфузии" },
+        { key: "convert", name: "🔄 Конвертеры" },
+        { key: "other", name: "📦 Прочее" }
+    ];
+
+    function renderTabs() {
+        const tabs = document.getElementById('categoryTabs');
+        tabs.innerHTML = categories.map((c,i) => 
+            `<div class="category-tab ${i===0?'active':''}" data-cat="${c.key}">${c.name}</div>`
+        ).join('');
+        document.querySelectorAll('.category-tab').forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                const cat = tab.dataset.cat;
+                const search = document.getElementById('calcSearch').value;
+                renderGrid(cat, search);
+            });
         });
     }
 
+    function renderGrid(cat='all', search='') {
+        const grid = document.getElementById('calcGrid');
+        const empty = document.getElementById('emptyMsg');
+        let filtered = calculators;
+        if (cat !== 'all') filtered = filtered.filter(c => c.cat === cat);
+        if (search) {
+            const s = search.toLowerCase();
+            filtered = filtered.filter(c => c.name.toLowerCase().includes(s) || c.desc.toLowerCase().includes(s));
+        }
+        if (filtered.length === 0) {
+            grid.innerHTML = '';
+            empty.style.display = 'block';
+            return;
+        }
+        empty.style.display = 'none';
+        grid.innerHTML = filtered.map(c => `
+            <div class="calc-card" onclick="showDetail(${c.id})">
+                <div class="calc-icon">${c.icon}</div>
+                <div class="calc-name">${c.name}</div>
+                <div class="calc-desc">${c.desc}</div>
+            </div>
+        `).join('');
+    }
+
     function showDetail(id) {
-        const calc = calculators.find(c=>c.id===id);
+        const calc = calculators.find(c => c.id === id);
         if (!calc) return;
         document.getElementById('listScreen').classList.remove('active');
         document.getElementById('detailScreen').classList.add('active');
         document.getElementById('detailTitle').textContent = calc.name;
-        let html = `<div class="calculator-card"><h2>${calc.icon} ${calc.name}</h2><div class="desc-text">${calc.desc}</div>`;
-        // Генерация формы и логики расчёта в зависимости от типа
+        const container = document.getElementById('detailContainer');
+        let html = `<div class="calc-panel"><h2>${calc.icon} ${calc.name}</h2><div class="desc-text">${calc.desc}</div>`;
         switch(calc.type) {
             case 'gcs': html += gcsForm(); break;
             case 'qsofa': html += qsofaForm(); break;
@@ -258,220 +308,191 @@
             case 'anaphylaxis': html += anaphylaxisForm(); break;
         }
         html += `</div>`;
-        document.getElementById('detailContainer').innerHTML = html;
+        container.innerHTML = html;
         attachEvents(calc.type);
     }
 
+    // Формы (такие же, как раньше, но обёрнуты в улучшенный CSS)
     function gcsForm() {
         return `
-            <div class="input-group"><label>Открывание глаз (E)</label><select id="gcs_e"><option value="">--</option><option value="4">4 - Спонтанное</option><option value="3">3 - На речь</option><option value="2">2 - На боль</option><option value="1">1 - Нет</option></select></div>
-            <div class="input-group"><label>Речевая реакция (V)</label><select id="gcs_v"><option value="">--</option><option value="5">5 - Ориентирован</option><option value="4">4 - Спутанная</option><option value="3">3 - Бессвязные слова</option><option value="2">2 - Нечленораздельные звуки</option><option value="1">1 - Нет</option></select></div>
-            <div class="input-group"><label>Двигательная реакция (M)</label><select id="gcs_m"><option value="">--</option><option value="6">6 - Выполняет команды</option><option value="5">5 - Локализует боль</option><option value="4">4 - Отдёргивает</option><option value="3">3 - Декортикационная</option><option value="2">2 - Децеребрационная</option><option value="1">1 - Нет</option></select></div>
-            <div id="gcsResult" class="result-box">Выберите все параметры</div>
-            <script>
-                function calcGCS() {
-                    const e = document.getElementById('gcs_e')?.value;
-                    const v = document.getElementById('gcs_v')?.value;
-                    const m = document.getElementById('gcs_m')?.value;
-                    if(!e||!v||!m){ document.getElementById('gcsResult').innerText = 'Выберите все параметры'; return; }
-                    const sum = +e + +v + +m;
-                    document.getElementById('gcsResult').innerHTML = `GCS = ${sum} баллов (${sum>=13?'лёгкое':sum>=9?'средней тяжести':'тяжёлое'} нарушение сознания)`;
-                }
-            </script>
+            <div class="input-field"><label>Открывание глаз</label><select id="gcs_e"><option value="">--</option><option value="4">4 - Спонтанное</option><option value="3">3 - На речь</option><option value="2">2 - На боль</option><option value="1">1 - Нет</option></select></div>
+            <div class="input-field"><label>Речь</label><select id="gcs_v"><option value="">--</option><option value="5">5 - Ориентирован</option><option value="4">4 - Спутанная</option><option value="3">3 - Бессвязные слова</option><option value="2">2 - Звуки</option><option value="1">1 - Нет</option></select></div>
+            <div class="input-field"><label>Движения</label><select id="gcs_m"><option value="">--</option><option value="6">6 - Выполняет</option><option value="5">5 - Локализует</option><option value="4">4 - Отдёргивает</option><option value="3">3 - Декортикация</option><option value="2">2 - Децеребрация</option><option value="1">1 - Нет</option></select></div>
+            <div class="result-panel"><div class="result-value" id="gcsResult">—</div><div class="result-text">Выберите все параметры</div></div>
         `;
     }
     function qsofaForm() {
         return `
-            <div class="input-group"><label>ЧДД ≥ 22/мин?</label><select id="qsofa_rr"><option value="0">Нет</option><option value="1">Да</option></select></div>
-            <div class="input-group"><label>Систолическое АД ≤ 100 мм рт.ст.?</label><select id="qsofa_bp"><option value="0">Нет</option><option value="1">Да</option></select></div>
-            <div class="input-group"><label>Нарушение сознания (GCS ≤ 14)?</label><select id="qsofa_gcs"><option value="0">Нет</option><option value="1">Да</option></select></div>
-            <div id="qsofaResult" class="result-box">Ответьте на вопросы</div>
-            <script>
-                function calcQSOFA() {
-                    const rr = +document.getElementById('qsofa_rr').value;
-                    const bp = +document.getElementById('qsofa_bp').value;
-                    const gcs = +document.getElementById('qsofa_gcs').value;
-                    const score = rr+bp+gcs;
-                    document.getElementById('qsofaResult').innerHTML = `qSOFA = ${score} баллов. ${score>=2?'Высокий риск неблагоприятного исхода. Рассмотрите перевод в ОРИТ.':'Низкий риск.'}`;
-                }
-            </script>
+            <div class="input-field"><label>ЧДД ≥ 22/мин</label><select id="qsofa_rr"><option value="0">Нет</option><option value="1">Да</option></select></div>
+            <div class="input-field"><label>АД сист. ≤ 100</label><select id="qsofa_bp"><option value="0">Нет</option><option value="1">Да</option></select></div>
+            <div class="input-field"><label>GCS ≤ 14</label><select id="qsofa_gcs"><option value="0">Нет</option><option value="1">Да</option></select></div>
+            <div class="result-panel"><div class="result-value" id="qsofaResult">—</div><div class="result-text">Ответьте на вопросы</div></div>
         `;
     }
     function hasbledForm() {
         return `
-            <div class="input-group"><label>Артериальная гипертензия (АД >160 мм)</label><select id="hb_htn"><option value="0">Нет</option><option value="1">Да</option></select></div>
-            <div class="input-group"><label>Нарушение функции почек/печени</label><select id="hb_renal"><option value="0">Нет</option><option value="1">Да (по 1 баллу за каждое)</option></select></div>
-            <div class="input-group"><label>Кровотечения в анамнезе</label><select id="hb_bleed"><option value="0">Нет</option><option value="1">Да</option></select></div>
-            <div class="input-group"><label>Лабильное МНО</label><select id="hb_inr"><option value="0">Нет</option><option value="1">Да</option></select></div>
-            <div class="input-group"><label>Возраст >65 лет</label><select id="hb_age"><option value="0">Нет</option><option value="1">Да</option></select></div>
-            <div class="input-group"><label>Приём алкоголя/НПВС</label><select id="hb_drugs"><option value="0">Нет</option><option value="1">Да (по 1 баллу)</option></select></div>
-            <div id="hasbledResult" class="result-box">Ответьте на вопросы</div>
-            <script>
-                function calcHASBLED() {
-                    const fields = ['hb_htn','hb_renal','hb_bleed','hb_inr','hb_age','hb_drugs'];
-                    let score=0;
-                    fields.forEach(id=>{ score += +document.getElementById(id).value; });
-                    document.getElementById('hasbledResult').innerHTML = `HAS-BLED = ${score} баллов. ${score>=3?'Высокий риск кровотечения! Рекомендована осторожность.':'Риск кровотечения низкий.'}`;
-                }
-            </script>
+            <div class="input-field"><label>АГ (>160 мм)</label><select id="hb_htn"><option value="0">Нет</option><option value="1">Да</option></select></div>
+            <div class="input-field"><label>Почки/печень</label><select id="hb_renal"><option value="0">Нет</option><option value="1">1-2 балла</option></select></div>
+            <div class="input-field"><label>Кровотечения</label><select id="hb_bleed"><option value="0">Нет</option><option value="1">Да</option></select></div>
+            <div class="input-field"><label>Лаб. МНО</label><select id="hb_inr"><option value="0">Нет</option><option value="1">Да</option></select></div>
+            <div class="input-field"><label>Возраст >65</label><select id="hb_age"><option value="0">Нет</option><option value="1">Да</option></select></div>
+            <div class="input-field"><label>Алкоголь/НПВС</label><select id="hb_drugs"><option value="0">Нет</option><option value="1">1-2 балла</option></select></div>
+            <div class="result-panel"><div class="result-value" id="hasbledResult">—</div><div class="result-text">Ответьте на вопросы</div></div>
         `;
     }
     function bmiForm() {
         return `
-            <div class="input-group"><label>Вес (кг)</label><input type="number" id="bmi_weight" placeholder="70"></div>
-            <div class="input-group"><label>Рост (см)</label><input type="number" id="bmi_height" placeholder="170"></div>
-            <button class="btn-calc" onclick="calcBMI()">Рассчитать</button>
-            <div id="bmiResult" class="result-box"></div>
-            <script>
-                function calcBMI() {
-                    const w = +document.getElementById('bmi_weight').value;
-                    const h = +document.getElementById('bmi_height').value / 100;
-                    if (!w || !h) { document.getElementById('bmiResult').innerText = 'Заполните поля'; return; }
-                    const bmi = (w/(h*h)).toFixed(1);
-                    let cat = '';
-                    if (bmi<18.5) cat='Недостаточный вес';
-                    else if (bmi<25) cat='Норма';
-                    else if (bmi<30) cat='Избыточный вес';
-                    else cat='Ожирение';
-                    document.getElementById('bmiResult').innerHTML = `ИМТ = ${bmi} кг/м² (${cat})`;
-                }
-            </script>
+            <div class="input-field"><label>Вес (кг)</label><input type="number" id="bmi_weight" placeholder="70"></div>
+            <div class="input-field"><label>Рост (см)</label><input type="number" id="bmi_height" placeholder="170"></div>
+            <button class="btn-primary" onclick="calcBMI()">Рассчитать ИМТ</button>
+            <div class="result-panel"><div class="result-value" id="bmiResult">—</div></div>
         `;
     }
     function infusionForm() {
         return `
-            <div class="input-group"><label>Объём раствора (мл)</label><input type="number" id="inf_vol" placeholder="500"></div>
-            <div class="input-group"><label>Время введения (часы)</label><input type="number" id="inf_time" placeholder="8"></div>
-            <div class="input-group"><label>Коэффициент капельницы (капли/мл)</label><select id="inf_factor"><option value="20">20 (стандартная)</option><option value="60">60 (микрокапельная)</option></select></div>
-            <button class="btn-calc" onclick="calcInfusion()">Рассчитать</button>
-            <div id="infResult" class="result-box"></div>
-            <script>
-                function calcInfusion() {
-                    const vol = +document.getElementById('inf_vol').value;
-                    const time = +document.getElementById('inf_time').value;
-                    const factor = +document.getElementById('inf_factor').value;
-                    if (!vol||!time) { document.getElementById('infResult').innerText = 'Заполните поля'; return; }
-                    const rate = (vol * factor) / (time * 60);
-                    document.getElementById('infResult').innerHTML = `Скорость: ${rate.toFixed(1)} кап/мин`;
-                }
-            </script>
+            <div class="input-field"><label>Объём (мл)</label><input type="number" id="inf_vol" placeholder="500"></div>
+            <div class="input-field"><label>Время (ч)</label><input type="number" id="inf_time" placeholder="8"></div>
+            <div class="input-field"><label>Капельница</label><select id="inf_factor"><option value="20">20 кап/мл</option><option value="60">60 кап/мл</option></select></div>
+            <button class="btn-primary" onclick="calcInfusion()">Рассчитать скорость</button>
+            <div class="result-panel"><div class="result-value" id="infResult">—</div></div>
         `;
     }
     function weightDoseForm() {
         return `
-            <div class="input-group"><label>Вес (кг)</label><input type="number" id="wd_weight" placeholder="70"></div>
-            <div class="input-group"><label>Доза (мг/кг)</label><input type="number" id="wd_dose" step="any" placeholder="0.1"></div>
-            <button class="btn-calc" onclick="calcWeightDose()">Рассчитать</button>
-            <div id="wdResult" class="result-box"></div>
-            <script>
-                function calcWeightDose() {
-                    const w = +document.getElementById('wd_weight').value;
-                    const d = +document.getElementById('wd_dose').value;
-                    if (!w||!d) { document.getElementById('wdResult').innerText='Заполните поля'; return; }
-                    document.getElementById('wdResult').innerHTML = `Доза: ${(w*d).toFixed(2)} мг`;
-                }
-            </script>
+            <div class="input-field"><label>Вес (кг)</label><input type="number" id="wd_weight" placeholder="70"></div>
+            <div class="input-field"><label>Доза (мг/кг)</label><input type="number" id="wd_dose" step="any" placeholder="0.1"></div>
+            <button class="btn-primary" onclick="calcWeightDose()">Рассчитать</button>
+            <div class="result-panel"><div class="result-value" id="wdResult">—</div></div>
         `;
     }
     function glucoseForm() {
         return `
-            <div class="input-group"><label>Значение глюкозы</label><input type="number" id="gluc_val" placeholder="5.5"></div>
-            <div class="input-group"><label>Единица измерения</label><select id="gluc_unit"><option value="mmol">ммоль/л → мг/дл</option><option value="mg">мг/дл → ммоль/л</option></select></div>
-            <button class="btn-calc" onclick="convertGlucose()">Конвертировать</button>
-            <div id="glucResult" class="result-box"></div>
-            <script>
-                function convertGlucose() {
-                    const val = +document.getElementById('gluc_val').value;
-                    const unit = document.getElementById('gluc_unit').value;
-                    if (!val) return;
-                    const converted = unit==='mmol' ? (val*18.018).toFixed(1) : (val/18.018).toFixed(2);
-                    const text = unit==='mmol' ? `${val} ммоль/л = ${converted} мг/дл` : `${val} мг/дл = ${converted} ммоль/л`;
-                    document.getElementById('glucResult').innerText = text;
-                }
-            </script>
+            <div class="input-field"><label>Значение</label><input type="number" id="gluc_val" placeholder="5.5"></div>
+            <div class="input-field"><label>Конвертация</label><select id="gluc_unit"><option value="mmol">ммоль/л → мг/дл</option><option value="mg">мг/дл → ммоль/л</option></select></div>
+            <button class="btn-primary" onclick="convertGlucose()">Конвертировать</button>
+            <div class="result-panel"><div class="result-value" id="glucResult">—</div></div>
         `;
     }
     function creatinineForm() {
         return `
-            <div class="input-group"><label>Креатинин</label><input type="number" id="creat_val" placeholder="1.0"></div>
-            <div class="input-group"><label>Единица</label><select id="creat_unit"><option value="mg">мг/дл → мкмоль/л</option><option value="umol">мкмоль/л → мг/дл</option></select></div>
-            <button class="btn-calc" onclick="convertCreatinine()">Конвертировать</button>
-            <div id="creatResult" class="result-box"></div>
-            <script>
-                function convertCreatinine() {
-                    const val = +document.getElementById('creat_val').value;
-                    const unit = document.getElementById('creat_unit').value;
-                    if (!val) return;
-                    const converted = unit==='mg' ? (val*88.4).toFixed(1) : (val/88.4).toFixed(2);
-                    const text = unit==='mg' ? `${val} мг/дл = ${converted} мкмоль/л` : `${val} мкмоль/л = ${converted} мг/дл`;
-                    document.getElementById('creatResult').innerText = text;
-                }
-            </script>
+            <div class="input-field"><label>Креатинин</label><input type="number" id="creat_val" placeholder="1.0"></div>
+            <div class="input-field"><label>Конвертация</label><select id="creat_unit"><option value="mg">мг/дл → мкмоль/л</option><option value="umol">мкмоль/л → мг/дл</option></select></div>
+            <button class="btn-primary" onclick="convertCreatinine()">Конвертировать</button>
+            <div class="result-panel"><div class="result-value" id="creatResult">—</div></div>
         `;
     }
     function bloodlossForm() {
         return `
-            <div class="input-group"><label>ЧСС (уд/мин)</label><input type="number" id="bl_hr" placeholder="100"></div>
-            <div class="input-group"><label>Систолическое АД (мм рт.ст.)</label><input type="number" id="bl_sbp" placeholder="100"></div>
-            <button class="btn-calc" onclick="calcBloodloss()">Рассчитать</button>
-            <div id="blResult" class="result-box"></div>
-            <script>
-                function calcBloodloss() {
-                    const hr = +document.getElementById('bl_hr').value;
-                    const sbp = +document.getElementById('bl_sbp').value;
-                    if (!hr||!sbp) { document.getElementById('blResult').innerText='Заполните поля'; return; }
-                    const shockIndex = (hr/sbp).toFixed(2);
-                    let severity = 'Норма';
-                    if (shockIndex>=1.0) severity='Тяжёлый шок (кровопотеря >30%)';
-                    else if (shockIndex>=0.8) severity='Умеренный шок (кровопотеря 20-30%)';
-                    else if (shockIndex>0.5) severity='Лёгкий шок';
-                    document.getElementById('blResult').innerHTML = `Шоковый индекс Альговера = ${shockIndex}. ${severity}.`;
-                }
-            </script>
+            <div class="input-field"><label>ЧСС (уд/мин)</label><input type="number" id="bl_hr" placeholder="100"></div>
+            <div class="input-field"><label>АД сист. (мм рт.ст.)</label><input type="number" id="bl_sbp" placeholder="100"></div>
+            <button class="btn-primary" onclick="calcBloodloss()">Рассчитать индекс</button>
+            <div class="result-panel"><div class="result-value" id="blResult">—</div></div>
         `;
     }
     function anaphylaxisForm() {
         return `
-            <div class="input-group"><label>Кожные проявления (крапивница, эритема)?</label><select id="ana_skin"><option value="1">Есть</option><option value="0">Нет</option></select></div>
-            <div class="input-group"><label>Ангионевротический отёк?</label><select id="ana_angio"><option value="1">Есть</option><option value="0">Нет</option></select></div>
-            <div class="input-group"><label>Одышка, бронхоспазм?</label><select id="ana_resp"><option value="1">Есть</option><option value="0">Нет</option></select></div>
-            <div class="input-group"><label>Гипотония, коллапс?</label><select id="ana_hypo"><option value="1">Есть</option><option value="0">Нет</option></select></div>
-            <div class="input-group"><label>Тошнота, боли в животе?</label><select id="ana_gi"><option value="1">Есть</option><option value="0">Нет</option></select></div>
-            <button class="btn-calc" onclick="calcAnaphylaxis()">Оценить</button>
-            <div id="anaResult" class="result-box"></div>
-            <script>
-                function calcAnaphylaxis() {
-                    const fields = ['ana_skin','ana_angio','ana_resp','ana_hypo','ana_gi'];
-                    let severity = 0;
-                    fields.forEach(id=>{ if(document.getElementById(id).value==='1') severity++; });
-                    let grade = 'I';
-                    if (severity>=4) grade='IV (тяжёлый шок)';
-                    else if (severity===3) grade='III (бронхоспазм, гипотония)';
-                    else if (severity===2) grade='II (выраженные кожные + респираторные/ЖКТ)';
-                    document.getElementById('anaResult').innerHTML = `Степень тяжести: ${grade} (Ring & Messmer)`;
-                }
-            </script>
+            <div class="input-field"><label>Кожа</label><select id="ana_skin"><option value="1">Есть</option><option value="0">Нет</option></select></div>
+            <div class="input-field"><label>Отёк</label><select id="ana_angio"><option value="1">Есть</option><option value="0">Нет</option></select></div>
+            <div class="input-field"><label>Дыхание</label><select id="ana_resp"><option value="1">Есть</option><option value="0">Нет</option></select></div>
+            <div class="input-field"><label>Гипотония</label><select id="ana_hypo"><option value="1">Есть</option><option value="0">Нет</option></select></div>
+            <div class="input-field"><label>ЖКТ</label><select id="ana_gi"><option value="1">Есть</option><option value="0">Нет</option></select></div>
+            <button class="btn-primary" onclick="calcAnaphylaxis()">Оценить тяжесть</button>
+            <div class="result-panel"><div class="result-value" id="anaResult">—</div></div>
         `;
     }
+
+    
+    // Математические функции (как прежде, только выводят в result-value и result-text)
+    function calcGCS() {
+        const e = +document.getElementById('gcs_e').value;
+        const v = +document.getElementById('gcs_v').value;
+        const m = +document.getElementById('gcs_m').value;
+        if (!e || !v || !m) { document.getElementById('gcsResult').innerText = '—'; document.querySelector('#gcsResult + .result-text').innerText = 'Выберите все параметры'; return; }
+        const sum = e+v+m;
+        document.getElementById('gcsResult').innerText = sum + ' баллов';
+        document.querySelector('#gcsResult + .result-text').innerText = sum>=13 ? 'Лёгкое нарушение' : sum>=9 ? 'Средней тяжести' : 'Тяжёлое';
+    }
+    function calcQSOFA() {
+        const rr = +document.getElementById('qsofa_rr').value;
+        const bp = +document.getElementById('qsofa_bp').value;
+        const gcs = +document.getElementById('qsofa_gcs').value;
+        const score = rr+bp+gcs;
+        document.getElementById('qsofaResult').innerText = score + ' баллов';
+        document.querySelector('#qsofaResult + .result-text').innerText = score>=2 ? 'Высокий риск сепсиса' : 'Низкий риск';
+    }
+    function calcHASBLED() {
+        const ids = ['hb_htn','hb_renal','hb_bleed','hb_inr','hb_age','hb_drugs'];
+        let score = 0;
+        ids.forEach(id => score += +document.getElementById(id).value);
+        document.getElementById('hasbledResult').innerText = score + ' баллов';
+        document.querySelector('#hasbledResult + .result-text').innerText = score>=3 ? '⚠️ Высокий риск кровотечения' : 'Риск низкий';
+    }
+    function calcBMI() {
+        const w = +document.getElementById('bmi_weight').value;
+        const h = +document.getElementById('bmi_height').value / 100;
+        if (!w || !h) { document.getElementById('bmiResult').innerText = '—'; return; }
+        const bmi = (w/(h*h)).toFixed(1);
+        document.getElementById('bmiResult').innerHTML = `${bmi} кг/м²`;
+    }
+    function calcInfusion() {
+        const vol = +document.getElementById('inf_vol').value;
+        const time = +document.getElementById('inf_time').value;
+        const factor = +document.getElementById('inf_factor').value;
+        if (!vol || !time) { document.getElementById('infResult').innerText = '—'; return; }
+        const rate = (vol * factor) / (time * 60);
+        document.getElementById('infResult').innerHTML = `${rate.toFixed(1)} кап/мин`;
+    }
+    function calcWeightDose() {
+        const w = +document.getElementById('wd_weight').value;
+        const d = +document.getElementById('wd_dose').value;
+        if (!w || !d) { document.getElementById('wdResult').innerText = '—'; return; }
+        document.getElementById('wdResult').innerHTML = `${(w*d).toFixed(2)} мг`;
+    }
+    function convertGlucose() {
+        const val = +document.getElementById('gluc_val').value;
+        const unit = document.getElementById('gluc_unit').value;
+        if (!val) { document.getElementById('glucResult').innerText = '—'; return; }
+        const conv = unit==='mmol' ? (val*18.018).toFixed(1) : (val/18.018).toFixed(2);
+        document.getElementById('glucResult').innerHTML = unit==='mmol' ? `${conv} мг/дл` : `${conv} ммоль/л`;
+    }
+    function convertCreatinine() {
+        const val = +document.getElementById('creat_val').value;
+        const unit = document.getElementById('creat_unit').value;
+        if (!val) { document.getElementById('creatResult').innerText = '—'; return; }
+        const conv = unit==='mg' ? (val*88.4).toFixed(1) : (val/88.4).toFixed(2);
+        document.getElementById('creatResult').innerHTML = unit==='mg' ? `${conv} мкмоль/л` : `${conv} мг/дл`;
+    }
+    function calcBloodloss() {
+        const hr = +document.getElementById('bl_hr').value;
+        const sbp = +document.getElementById('bl_sbp').value;
+        if (!hr || !sbp) { document.getElementById('blResult').innerText = '—'; return; }
+        const index = (hr/sbp).toFixed(2);
+        let severity = '';
+        if (index>=1.0) severity = 'Тяжёлый шок (>30%)';
+        else if (index>=0.8) severity = 'Умеренный шок (20-30%)';
+        else if (index>0.5) severity = 'Лёгкий шок';
+        else severity = 'Норма';
+        document.getElementById('blResult').innerHTML = `${index} (${severity})`;
+    }
+    function calcAnaphylaxis() {
+        const ids = ['ana_skin','ana_angio','ana_resp','ana_hypo','ana_gi'];
+        let severity = 0;
+        ids.forEach(id => { if (document.getElementById(id).value === '1') severity++; });
+        let grade = 'I';
+        if (severity>=4) grade = 'IV (тяжёлый шок)';
+        else if (severity===3) grade = 'III';
+        else if (severity===2) grade = 'II';
+        document.getElementById('anaResult').innerHTML = `Степень ${grade}`;
+    }
+
     function attachEvents(type) {
-        // Для шкал, где нет кнопки, а результат меняется динамически
         if (type==='gcs') {
-            ['gcs_e','gcs_v','gcs_m'].forEach(id=>{
-                const el = document.getElementById(id);
-                if(el) el.addEventListener('change', calcGCS);
-            });
+            ['gcs_e','gcs_v','gcs_m'].forEach(id => document.getElementById(id)?.addEventListener('change', calcGCS));
         } else if (type==='qsofa') {
-            ['qsofa_rr','qsofa_bp','qsofa_gcs'].forEach(id=>{
-                const el = document.getElementById(id);
-                if(el) el.addEventListener('change', calcQSOFA);
-            });
+            ['qsofa_rr','qsofa_bp','qsofa_gcs'].forEach(id => document.getElementById(id)?.addEventListener('change', calcQSOFA));
         } else if (type==='hasbled') {
-            ['hb_htn','hb_renal','hb_bleed','hb_inr','hb_age','hb_drugs'].forEach(id=>{
-                const el = document.getElementById(id);
-                if(el) el.addEventListener('change', calcHASBLED);
-            });
+            ['hb_htn','hb_renal','hb_bleed','hb_inr','hb_age','hb_drugs'].forEach(id => document.getElementById(id)?.addEventListener('change', calcHASBLED));
         }
-        // Остальные кнопки привязаны через onclick в самой форме
     }
 
     function showList() {
@@ -479,22 +500,18 @@
         document.getElementById('listScreen').classList.add('active');
     }
     function goBackToMain() { window.location.href = 'index.html'; }
+    function toggleTheme() {
+        document.body.classList.toggle('dark');
+        document.querySelector('.theme-toggle').textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
+    }
 
     document.addEventListener('DOMContentLoaded', () => {
-        document.querySelectorAll('.category-tab').forEach(tab => {
-            tab.addEventListener('click', ()=>{
-                document.querySelectorAll('.category-tab').forEach(t=>t.classList.remove('active'));
-                tab.classList.add('active');
-                const cat = tab.dataset.category;
-                const search = document.getElementById('calcSearch').value;
-                renderList(cat, search);
-            });
+        renderTabs();
+        renderGrid();
+        document.getElementById('calcSearch').addEventListener('input', (e) => {
+            const activeCat = document.querySelector('.category-tab.active')?.dataset.cat || 'all';
+            renderGrid(activeCat, e.target.value);
         });
-        document.getElementById('calcSearch').addEventListener('input', (e)=>{
-            const cat = document.querySelector('.category-tab.active')?.dataset.category || 'all';
-            renderList(cat, e.target.value);
-        });
-        renderList();
     });
 </script>
 </body>
