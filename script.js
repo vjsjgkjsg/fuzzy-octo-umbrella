@@ -122,40 +122,45 @@ function switchTab(tab) {
     });
 }
 
-// Открытие категории: для готовых разделов – переход на отдельную страницу,
-// для остальных – временная заглушка внутри приложения
+// Открытие категории: все разделы переадресуются на конкретные HTML-файлы
 function openCategory(title, tags) {
-    // Готовые разделы с отдельными HTML
-    if (title === "Неотложные состояния") {
-        window.location.href = "emergency.html";
-        return;
-    }
-    if (title === "Первая помощь") {
-        window.location.href = "first_aid.html";
-        return;
-    }
-    // Избранное ведёт на соответствующий таб
+    const routeMap = {
+        "Первая помощь": "first_aid.html",
+        "Неотложные состояния": "emergency.html",
+        "Лекарственный справочник": "drugs.html",
+        "Клинические протоколы РК": "protocols.html",
+        "Приказы МЗ РК": "orders.html",
+        "Медицинские калькуляторы": "calculators.html",
+        "Медицинские шпаргалки": "cheat-sheets.html",
+        "Кардиология": "cardiology.html",
+        "Неврология": "neurology.html",
+        "Пульмонология": "pulmonology.html",
+        "Инфекционные болезни": "infections.html",
+        "Травматология": "traumatology.html",
+        "Педиатрия": "pediatrics.html",
+        "Акушерство и гинекология": "obstetrics.html",
+        "Лабораторная диагностика": "lab.html",
+        "Справочник фельдшера": "paramedic.html",
+        "Инъекции и манипуляции": "injections.html",
+        "Скорая медицинская помощь": "ambulance.html",
+        "МКБ-10": "icd10.html"
+    };
+
     if (title === "Избранное") {
         switchTab('favorites');
         return;
     }
 
-    // Остальные разделы – заглушка
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    const categoryScreen = document.getElementById('categoryScreen');
-    const titleEl = document.getElementById('categoryTitle');
-    const contentEl = document.getElementById('categoryContent');
-    
-    if (titleEl) titleEl.textContent = title;
-    if (contentEl) {
-        contentEl.innerHTML = `<div class="placeholder">Раздел «${title}» в разработке</div>`;
+    const page = routeMap[title];
+    if (page) {
+        window.location.href = page;
+    } else {
+        // fallback на главную, если что-то пошло не так
+        window.location.href = 'index.html';
     }
-    if (categoryScreen) categoryScreen.classList.add('active');
-    
-    document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
 }
 
-// Закрытие категории (кнопка "Назад") – возврат на главную
+// Закрытие категории (кнопка "Назад" внутри index.html) – возврат на главную
 function closeCategory() {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById('homeScreen').classList.add('active');
