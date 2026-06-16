@@ -58,6 +58,7 @@
             align-items: center;
             justify-content: center;
             transition: 0.2s;
+            user-select: none;
         }
         .letter-btn.active {
             background: var(--drug-primary);
@@ -128,9 +129,6 @@
             color: var(--text);
             line-height: 1.5;
         }
-        .drug-section ul {
-            padding-left: 20px;
-        }
         .btn-back {
             background: var(--drug-primary);
             color: white;
@@ -142,7 +140,6 @@
             margin-top: 16px;
             cursor: pointer;
             width: 100%;
-            transition: opacity 0.2s;
         }
         .btn-back:active { opacity: 0.8; }
         .empty-message { text-align: center; color: var(--subtext); padding: 30px; }
@@ -191,6 +188,7 @@
 </div>
 
 <script>
+    // База препаратов (20 наименований)
     const drugs = [
         { id:1, name:"Амоксициллин", mnn:"Амоксициллин", icon:"💊", letter:"А",
           tradenames:"Амоксил, Флемоксин Солютаб, Хиконцил",
@@ -354,48 +352,112 @@
         }
     ];
 
-    // Сбор уникальных первых букв
-    const alphabet = [...new Set(drugs.map(d => d.name.charAt(0).toUpperCase()))].sort();
+    let activeLetter = '';  // активная буква фильтра
 
+    // Генерируем кнопки алфавита по первой букве названий
     function renderAlphabet() {
+        const letters = [...new Set(drugs.map(d => d.name.charAt(0).toUpperCase()))].sort();
         const bar = document.getElementById('alphabetBar');
-        bar.innerHTML = alphabet.map(letter => `<div class="letter-btn" data-letter="${letter}">${letter}</div>`).join('');
+        bar.innerHTML = letters.map(letter =>
+            `<div class="letter-btn${letter === activeLetter ? ' active' : ''}" data-letter="${letter}">${letter}</div>`
+        ).join('');
+
         document.querySelectorAll('.letter-btn').forEach(btn => {
             btn.addEventListener('click', () => {
-                document.querySelectorAll('.letter-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                const letter = btn.dataset.letter;
-                const search = document.getElementById('drugSearch').value;
-                renderDrugGrid(letter, search);
+                activeLetter = btn.dataset.letter;
+                renderAlphabet();  // перерисовать, чтобы снять/поставить активный класс
+                renderDrugGrid();
             });
         });
     }
 
-    function renderDrugGrid(letter = '', search = '') {
+    // Отображение карточек препаратов с учётом фильтра и поиска
+    function renderDrugGrid() {
+        const searchText = document.getElementById('drugSearch').value.toLowerCase().trim();
+        let filtered = drugs;
+
+        if (activeLetter) {
+            filtered = filtered.filter(d => d.name.charAt(0).toUpperCase() === activeLetter);
+        }
+        if (searchText) {
+            filtered = filtered.filter(d =>
+                d.name.toLowerCase().includes(searchText) || d.mnn.toLowerCase().includes(searchText)
+            );
+        }
+
         const grid = document.getElementById('drugGrid');
         const empty = document.getElementById('emptyMsg');
-        let filtered = drugs;
-        if (letter) filtered = filtered.filter(d => d.name.charAt(0).toUpperCase() === letter);
-        if (search) {
-            const s = search.toLowerCase();
-            filtered = filtered.filter(d => d.name.toLowerCase().includes(s) || d.mnn.toLowerCase().includes(s));
-        }
+
         if (filtered.length === 0) {
             grid.innerHTML = '';
             empty.style.display = 'block';
-            return;
+        } else {
+            empty.style.display = 'none';
+            grid.innerHTML = filtered.map(d => `
+                <div class="drug-card" onclick="showDetail(${d.id})">
+                    <div class="drug-icon">${d.icon}</div>
+                    <div class="drug-name">${d.name}</div>
+                    <div class="drug-mnn">${d.mnn}</div>
+                </div>
+            `).join('');
         }
-        empty.style.display = 'none';
-        grid.innerHTML = filtered.map(d => `
-            <div class="drug-card" onclick="showDetail(${d.id})">
-                <div class="drug-icon">${d.icon}</div>
-                <div class="drug-name">${d.name}</div>
-                <div class="drug-mnn">${d.mnn}</div>
-            </div>
-        `).join('');
     }
 
     function showDetail(id) {
         const drug = drugs.find(d => d.id === id);
         if (!drug) return;
-        document.getEl
+        document.getElementById('listScreen').classList.remove('active');
+        document.getElementById('detailScreen').classList.add('active');
+        document.getElementById('detailTitle').textContent = drug.name;
+        document.getElementById('detailContainer').innerHTML = `
+            <div class="drug-panel">
+                <h2>${drug.icon} ${drug.name}</h2>
+                <div class="mnn">МНН: ${drug.mnn}</div>
+                <div class="tradenames">Торговые названия в РК: ${drug.tradenames}</div>
+                <div class="drug-section">
+                    <h3>📋 Показания</h3>
+                    <p>${drug.indications}</p>
+                </div>
+                <div class="drug-section">
+                    <h3>⚠️ Противопоказания</h3>
+                    <p>${drug.contraindications}</p>
+                </div>
+                <div class="drug-section">
+                    <h3>🧑‍⚕️ Дозировка взрослым</h3>
+                    <p>${drug.adultDose}</p>
+                </div>
+                <div class="drug-section">
+                    <h3>👶 Дозировка детям</h3>
+                    <p>${drug.childDose}</p>
+                </div>
+                <div class="drug-section">
+                    <h3>📝 Особые указания</h3>
+                    <p>${drug.special}</p>
+                </div>
+                <button class="btn-back" onclick="showList()">← Вернуться к списку</button>
+            </div>
+        `;
+    }
+
+    function showList() {
+        document.getElementById('detailScreen').classList.remove('active');
+        document.getElementById('listScreen').classList.add('active');
+    }
+
+    function goBackToMain() { window.location.href = 'index.html'; }
+    function toggleTheme() {
+        document.body.classList.toggle('dark');
+        document.querySelector('.theme-toggle').textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
+    }
+
+    // При загрузке
+    document.addEventListener('DOMContentLoaded', () => {
+        renderAlphabet();
+        renderDrugGrid(); // покажет все препараты
+        document.getElementById('drugSearch').addEventListener('input', () => {
+            renderDrugGrid();
+        });
+    });
+</script>
+</body>
+</html>
