@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Лекарственный справочник – MedPocket KZ</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        :root {
+            --drug-primary: #00796B;
+            --drug-light: #E0F2F1;
+            --drug-border: #80CBC4;
+            --drug-shadow: 0 8px 20px rgba(0,0,0,0.05);
+        }
+        body.dark {
+            --drug-primary: #4DB6AC;
+            --drug-light: #004D40;
+            --drug-border: #26A69A;
+            --drug-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        }
+        .drug-container { padding: 0 0 30px; }
+        .drug-search {
+            margin: 16px 16px 20px;
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 6px 18px;
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--border);
+            box-shadow: var(--drug-shadow);
+        }
+        .drug-search input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-size: 17px;
+            padding: 12px 0;
+            outline: none;
+            color: var(--text);
+        }
+        .alphabet-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 0 16px 16px;
+        }
+        .letter-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--text);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+        .letter-btn.active {
+            background: var(--drug-primary);
+            color: white;
+            border-color: var(--drug-primary);
+        }
+        .drug-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 0 16px;
+        }
+        .drug-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 14px;
+            width: calc(50% - 6px);
+            box-shadow: var(--drug-shadow);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: 0.15s;
+            text-align: center;
+        }
+        .drug-card:active { transform: scale(0.96); }
+        .drug-card .drug-icon { font-size: 32px; margin-bottom: 8px; }
+        .drug-card .drug-name { font-weight: 700; font-size: 15px; color: var(--text); margin-bottom: 4px; }
+        .drug-card .drug-mnn { font-size: 12px; color: var(--subtext); }
+
+        .detail-screen { padding: 0 16px 30px; }
+        .drug-panel {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: var(--drug-shadow);
+            border: 2px solid var(--drug-primary);
+        }
+        .drug-panel h2 {
+            color: var(--drug-primary);
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+        .drug-panel .mnn {
+            font-size: 15px;
+            color: var(--subtext);
+            margin-bottom: 6px;
+        }
+        .drug-panel .tradenames {
+            background: var(--drug-light);
+            border-radius: 12px;
+            padding: 10px 14px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            color: var(--drug-primary);
+            font-size: 14px;
+        }
+        .drug-section {
+            margin-bottom: 20px;
+        }
+        .drug-section h3 {
+            font-size: 17px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+        .drug-section p, .drug-section li {
+            font-size: 15px;
+            color: var(--text);
+            line-height: 1.5;
+        }
+        .drug-section ul {
+            padding-left: 20px;
+        }
+        .btn-back {
+            background: var(--drug-primary);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 14px;
+            font-weight: 700;
+            font-size: 16px;
+            margin-top: 16px;
+            cursor: pointer;
+            width: 100%;
+            transition: opacity 0.2s;
+        }
+        .btn-back:active { opacity: 0.8; }
+        .empty-message { text-align: center; color: var(--subtext); padding: 30px; }
+    </style>
+</head>
+<body>
+<div id="app">
+    <header class="header">
+        <div class="logo">MedPocket KZ</div>
+        <div class="header-icons">
+            <span>🔔</span>
+            <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+            <span>⚙️</span>
+        </div>
+    </header>
+
+    <main class="content">
+        <section id="listScreen" class="screen active">
+            <div class="category-header" style="padding:16px;">
+                <span class="back-button" onclick="goBackToMain()">← Назад</span>
+                <h2 class="category-title">💊 Лекарственный справочник</h2>
+            </div>
+            <div class="drug-search">
+                <input type="text" placeholder="🔍 Поиск по названию или МНН..." id="drugSearch">
+            </div>
+            <div class="alphabet-bar" id="alphabetBar"></div>
+            <div class="drug-grid" id="drugGrid"></div>
+            <div class="empty-message" id="emptyMsg" style="display:none;">Ничего не найдено</div>
+        </section>
+
+        <section id="detailScreen" class="screen detail-screen">
+            <div class="category-header" style="padding:16px 0;">
+                <span class="back-button" onclick="showList()">← К списку</span>
+                <h2 class="category-title" id="detailTitle"></h2>
+            </div>
+            <div id="detailContainer"></div>
+        </section>
+    </main>
+
+    <nav class="tab-bar">
+        <div class="tab-item" onclick="goBackToMain()">🏠</div>
+        <div class="tab-item">🔍</div>
+        <div class="tab-item">⭐</div>
+        <div class="tab-item">👤</div>
+    </nav>
+</div>
+
+<script>
+    const drugs = [
+        { id:1, name:"Амоксициллин", mnn:"Амоксициллин", icon:"💊", letter:"А",
+          tradenames:"Амоксил, Флемоксин Солютаб, Хиконцил",
+          indications:"Инфекции дыхательных путей (бронхит, пневмония), ЛОР-органов (отит, синусит), мочевыводящих путей, кожи и мягких тканей.",
+          contraindications:"Гиперчувствительность к пенициллинам, инфекционный мононуклеоз.",
+          adultDose:"По 500 мг 3 раза в сутки или 750–1000 мг 2 раза в сутки. Курс 7–10 дней.",
+          childDose:"Детям: 20–40 мг/кг/сут в 3 приёма (суспензия). Максимальная суточная доза 150 мг/кг.",
+          special:"При тяжёлых инфекциях дозу удваивают. При нарушении функции почек интервал увеличивают."
+        },
+        { id:2, name:"Цефтриаксон", mnn:"Цефтриаксон", icon:"💉", letter:"Ц",
+          tradenames:"Роцефин, Цефтриаксон-КМП, Цефсон",
+          indications:"Тяжёлые инфекции: менингит, сепсис, пневмония, пиелонефрит, гонорея, болезнь Лайма.",
+          contraindications:"Гиперчувствительность к цефалоспоринам, новорождённые с гипербилирубинемией (риск билирубиновой энцефалопатии).",
+          adultDose:"1–2 г 1 раз в сутки в/в или в/м. При менингите – до 4 г/сут.",
+          childDose:"Детям: 50–75 мг/кг/сут в 1–2 введения. При менингите 100 мг/кг/сут (макс. 4 г).",
+          special:"Не вводить одновременно с кальцийсодержащими растворами (опасность преципитации в лёгких)."
+        },
+        { id:3, name:"Азитромицин", mnn:"Азитромицин", icon:"💊", letter:"А",
+          tradenames:"Сумамед, Азитро, Зитромакс",
+          indications:"Инфекции верхних и нижних дыхательных путей, урогенитальные инфекции (хламидиоз), инфекции кожи.",
+          contraindications:"Гиперчувствительность к макролидам, тяжёлая печёночная недостаточность.",
+          adultDose:"500 мг 1 раз в сутки 3 дня (курсовая доза 1,5 г). При урогенитальных инфекциях – 1 г однократно.",
+          childDose:"Детям: 10 мг/кг 1 раз в сутки 3 дня.",
+          special:"Принимать за 1 час до или через 2 часа после еды."
+        },
+        { id:4, name:"Ибупрофен", mnn:"Ибупрофен", icon:"💊", letter:"И",
+          tradenames:"Нурофен, Ибуфен, МИГ",
+          indications:"Боль (головная, зубная, мышечная), лихорадка, воспалительные заболевания суставов.",
+          contraindications:"Язвенная болезнь желудка, бронхиальная астма, тяжёлая почечная/печёночная недостаточность, III триместр беременности.",
+          adultDose:"200–400 мг каждые 6–8 ч. Максимальная суточная доза 1200 мг.",
+          childDose:"Детям от 6 мес: 20–30 мг/кг/сут в 3–4 приёма. Макс. 30 мг/кг/сут.",
+          special:"При длительном приёме – контроль функции почек и ЖКТ."
+        },
+        { id:5, name:"Парацетамол", mnn:"Парацетамол", icon:"💊", letter:"П",
+          tradenames:"Панадол, Эффералган, Цефекон",
+          indications:"Боль слабой и умеренной интенсивности, лихорадка.",
+          contraindications:"Тяжёлая печёночная недостаточность, дефицит глюкозо-6-фосфатдегидрогеназы.",
+          adultDose:"500–1000 мг каждые 4–6 ч. Максимальная суточная доза 4000 мг.",
+          childDose:"Детям: 10–15 мг/кг каждые 4–6 ч. Макс. 60 мг/кг/сут (не более 3000 мг).",
+          special:"Осторожно при алкоголизме, голодании (риск гепатотоксичности)."
+        },
+        { id:6, name:"Омепразол", mnn:"Омепразол", icon:"💊", letter:"О",
+          tradenames:"Омез, Лосек, Гастрозол",
+          indications:"Язвенная болезнь желудка и ДПК, ГЭРБ, эрозивный эзофагит, синдром Золлингера-Эллисона.",
+          contraindications:"Гиперчувствительность, одновременный приём с атазанавиром.",
+          adultDose:"20–40 мг 1 раз в сутки. При язве – 20 мг 2 раза в сутки или 40 мг однократно.",
+          childDose:"Детям старше 1 года: 0,5–1 мг/кг/сут (макс. 40 мг).",
+          special:"Капсулы принимают утром натощак."
+        },
+        { id:7, name:"Лоперамид", mnn:"Лоперамид", icon:"💊", letter:"Л",
+          tradenames:"Имодиум, Лопедиум",
+          indications:"Симптоматическое лечение острой и хронической диареи.",
+          contraindications:"Острая дизентерия с кровью и гипертермией, язвенный колит, кишечная непроходимость, дети до 6 лет.",
+          adultDose:"2 мг после каждого жидкого стула, макс. 16 мг/сут.",
+          childDose:"Детям старше 6 лет: 1 мг после каждого жидкого стула, макс. 8 мг/сут.",
+          special:"При отсутствии эффекта в течение 48 ч – обратиться к врачу."
+        },
+        { id:8, name:"Метронидазол", mnn:"Метронидазол", icon:"💊", letter:"М",
+          tradenames:"Трихопол, Метрогил, Флагил",
+          indications:"Анаэробные инфекции, трихомониаз, амёбиаз, лямблиоз, инфекции ЖКТ, гинекологические инфекции.",
+          contraindications:"Первый триместр беременности, лейкопения, органические заболевания ЦНС.",
+          adultDose:"500 мг 2–3 раза в сутки 7–10 дней. При трихомониазе – 2 г однократно.",
+          childDose:"Детям: 7,5 мг/кг 3 раза в сутки (макс. 400 мг на приём).",
+          special:"Несовместим с алкоголем (дисульфирамоподобная реакция)."
+        },
+        { id:9, name:"Диклофенак", mnn:"Диклофенак натрия", icon:"💉", letter:"Д",
+          tradenames:"Вольтарен, Диклоберл, Ортофен",
+          indications:"Боль, воспаление при заболеваниях опорно-двигательного аппарата, почечная колика, приступ мигрени.",
+          contraindications:"Язвенная болезнь, нарушения свёртываемости, тяжёлая сердечная недостаточность, беременность III триместр.",
+          adultDose:"75–150 мг/сут в 2–3 приёма. В/м 75 мг 1–2 раза в день.",
+          childDose:"Детям старше 6 лет: 1–3 мг/кг/сут в 2–3 приёма.",
+          special:"При длительном применении – контроль функции почек и картины крови."
+        },
+        { id:10, name:"Цетиризин", mnn:"Цетиризин", icon:"💊", letter:"Ц",
+          tradenames:"Зиртек, Зодак, Цетрин",
+          indications:"Аллергический ринит, крапивница, отёк Квинке.",
+          contraindications:"Гиперчувствительность, тяжёлая почечная недостаточность, дети до 6 мес (для капель).",
+          adultDose:"10 мг 1 раз в сутки.",
+          childDose:"Дети 6–12 мес: 2,5 мг 1 раз/сут; 1–6 лет: 2,5 мг 2 раза/сут; 6–12 лет: 5 мг 2 раза/сут или 10 мг вечером.",
+          special:"Возможна сонливость, поэтому осторожно при вождении."
+        },
+        { id:11, name:"Сальбутамол", mnn:"Сальбутамол", icon:"💨", letter:"С",
+          tradenames:"Вентолин, Сальбутамол-Тева",
+          indications:"Бронхиальная астма, ХОБЛ (купирование приступов).",
+          contraindications:"Гиперчувствительность, угроза выкидыша.",
+          adultDose:"Ингаляционно 100–200 мкг (1–2 вдоха) до 4 раз в сутки.",
+          childDose:"Дети 4–11 лет: 100 мкг (1 вдох) до 4 раз/сут. Старше 12 лет – как взрослые.",
+          special:"При неэффективности обычной дозы – обратиться к врачу (возможно обострение)."
+        },
+        { id:12, name:"Эналаприл", mnn:"Эналаприл", icon:"💊", letter:"Э",
+          tradenames:"Эналаприл-Акри, Энап, Ренитек",
+          indications:"Артериальная гипертензия, хроническая сердечная недостаточность.",
+          contraindications:"Ангионевротический отёк в анамнезе, двусторонний стеноз почечных артерий, беременность.",
+          adultDose:"Начальная 5 мг 1 раз/сут, поддерживающая 10–20 мг/сут (макс. 40 мг).",
+          childDose:"Безопасность у детей не установлена.",
+          special:"Контроль АД и функции почек до и во время лечения."
+        },
+        { id:13, name:"Ацетилсалициловая кислота", mnn:"Аспирин", icon:"💊", letter:"А",
+          tradenames:"Аспирин Кардио, Тромбо АСС, КардиАСК",
+          indications:"Профилактика тромбозов, ОКС, боль, лихорадка.",
+          contraindications:"Язвенная болезнь, геморрагический диатез, бронхиальная астма, дети до 12 лет (риск синдрома Рея).",
+          adultDose:"Антиагрегант: 75–150 мг/сут. Жаропонижающее: 500 мг каждые 4–6 ч (макс. 3 г/сут).",
+          childDose:"Не применять как жаропонижающее у детей!",
+          special:"Принимать после еды, запивая большим количеством воды."
+        },
+        { id:14, name:"Кеторолак", mnn:"Кеторолак", icon:"💉", letter:"К",
+          tradenames:"Кетанов, Кеторол, Долак",
+          indications:"Сильный болевой синдром (послеоперационная боль, почечная колика).",
+          contraindications:"Язвенная болезнь, почечная недостаточность, нарушения свёртываемости, беременность.",
+          adultDose:"10 мг внутрь каждые 6 ч. В/м 10–30 мг каждые 4–6 ч. Максимальная суточная доза 90 мг.",
+          childDose:"Не рекомендуется детям до 16 лет.",
+          special:"Не применять более 5 дней. Не комбинировать с другими НПВС."
+        },
+        { id:15, name:"Дексаметазон", mnn:"Дексаметазон", icon:"💉", letter:"Д",
+          tradenames:"Дексаметазон-Дарница, Дексазон",
+          indications:"Тяжёлые аллергические реакции, отёк мозга, шок, воспалительные заболевания.",
+          contraindications:"Системные грибковые инфекции, одновременное введение живых вакцин.",
+          adultDose:"Внутривенно/внутримышечно 4–20 мг, затем 4 мг каждые 6 ч.",
+          childDose:"Детям: 0,2–0,4 мг/кг/сут в 3–4 введения.",
+          special:"При длительном применении – постепенная отмена."
+        },
+        { id:16, name:"Фуросемид", mnn:"Фуросемид", icon:"💧", letter:"Ф",
+          tradenames:"Лазикс, Фуросемид-Дарница",
+          indications:"Отёчный синдром (сердечная недостаточность, цирроз, почечная недостаточность), гипертонический криз.",
+          contraindications:"Анурия, печёночная кома, гипокалиемия.",
+          adultDose:"20–80 мг/сут внутрь или в/в. При кризе – 40–80 мг в/в.",
+          childDose:"Детям: 1–2 мг/кг (макс. 6 мг/кг) внутрь или в/в 1–2 раза в сутки.",
+          special:"Контроль электролитов (K⁺, Na⁺) и диуреза."
+        },
+        { id:17, name:"Амлодипин", mnn:"Амлодипин", icon:"💊", letter:"А",
+          tradenames:"Норваск, Амлодипин-Тева",
+          indications:"Артериальная гипертензия, стенокардия.",
+          contraindications:"Тяжёлая гипотензия, шок, нестабильная стенокардия.",
+          adultDose:"5–10 мг 1 раз в сутки.",
+          childDose:"Безопасность у детей не установлена.",
+          special:"Возможны периферические отёки."
+        },
+        { id:18, name:"Метопролол", mnn:"Метопролол", icon:"💊", letter:"М",
+          tradenames:"Беталок, Эгилок, Метопролол-ратиофарм",
+          indications:"Гипертония, стенокардия, хроническая сердечная недостаточность, тахиаритмии.",
+          contraindications:"Брадикардия (<45 уд/мин), AV-блокада II–III ст., кардиогенный шок.",
+          adultDose:"25–100 мг 1–2 раза в сутки. При ХСН начинать с 12,5 мг.",
+          childDose:"Безопасность не изучена.",
+          special:"Не прекращать резко (синдром отмены)."
+        },
+        { id:19, name:"Кларитромицин", mnn:"Кларитромицин", icon:"💊", letter:"К",
+          tradenames:"Клацид, Фромилид, Кламед",
+          indications:"Инфекции дыхательных путей, обострение хронического бронхита, внебольничная пневмония, хеликобактерная инфекция.",
+          contraindications:"Гиперчувствительность к макролидам, тяжёлая печёночная недостаточность, одновременный приём терфенадина.",
+          adultDose:"500 мг 2 раза в сутки 7–14 дней.",
+          childDose:"Детям: 7,5 мг/кг 2 раза в сутки (макс. 500 мг 2 раза/сут).",
+          special:"Принимать независимо от еды."
+        },
+        { id:20, name:"Левофлоксацин", mnn:"Левофлоксацин", icon:"💊", letter:"Л",
+          tradenames:"Таваник, Левофлокс, Леволет",
+          indications:"Инфекции дыхательных путей, мочевыводящих путей, простатит, сибирская язва.",
+          contraindications:"Эпилепсия, поражение сухожилий в анамнезе, дети до 18 лет, беременность.",
+          adultDose:"500 мг 1–2 раза в сутки 7–10 дней.",
+          childDose:"Противопоказан детям до 18 лет.",
+          special:"Избегать УФ-облучения. Риск тендинита."
+        }
+    ];
+
+    // Сбор уникальных первых букв
+    const alphabet = [...new Set(drugs.map(d => d.name.charAt(0).toUpperCase()))].sort();
+
+    function renderAlphabet() {
+        const bar = document.getElementById('alphabetBar');
+        bar.innerHTML = alphabet.map(letter => `<div class="letter-btn" data-letter="${letter}">${letter}</div>`).join('');
+        document.querySelectorAll('.letter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.letter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const letter = btn.dataset.letter;
+                const search = document.getElementById('drugSearch').value;
+                renderDrugGrid(letter, search);
+            });
+        });
+    }
+
+    function renderDrugGrid(letter = '', search = '') {
+        const grid = document.getElementById('drugGrid');
+        const empty = document.getElementById('emptyMsg');
+        let filtered = drugs;
+        if (letter) filtered = filtered.filter(d => d.name.charAt(0).toUpperCase() === letter);
+        if (search) {
+            const s = search.toLowerCase();
+            filtered = filtered.filter(d => d.name.toLowerCase().includes(s) || d.mnn.toLowerCase().includes(s));
+        }
+        if (filtered.length === 0) {
+            grid.innerHTML = '';
+            empty.style.display = 'block';
+            return;
+        }
+        empty.style.display = 'none';
+        grid.innerHTML = filtered.map(d => `
+            <div class="drug-card" onclick="showDetail(${d.id})">
+                <div class="drug-icon">${d.icon}</div>
+                <div class="drug-name">${d.name}</div>
+                <div class="drug-mnn">${d.mnn}</div>
+            </div>
+        `).join('');
+    }
+
+    function showDetail(id) {
+        const drug = drugs.find(d => d.id === id);
+        if (!drug) return;
+        document.getEl
